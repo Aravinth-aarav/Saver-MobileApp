@@ -1,7 +1,8 @@
 /**
  * FinanceContext.js
  * Manages financial transactions, categories, budgets, savings goals,
- * dynamic report aggregations (Daily, Weekly, Monthly), and personalized Rupee (₹) alerts.
+ * dynamic report aggregations (Daily, Weekly, Monthly), personalized Rupee (₹) alerts,
+ * and live reactive notifications for the Header Bell icon.
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -18,6 +19,40 @@ const TX_STORAGE_KEY = '@saver_transactions_v2';
 const CAT_STORAGE_KEY = '@saver_categories_v2';
 const GOAL_STORAGE_KEY = '@saver_savings_goal_v2';
 const BUDGET_STORAGE_KEY = '@saver_monthly_budget_v2';
+const NOTIF_STORAGE_KEY = '@saver_notifications_v3';
+
+const INITIAL_NOTIFICATIONS = [
+  {
+    id: 'notif-seed-1',
+    title: 'Monthly Budget Allocated 🎯',
+    message: 'Your monthly limit of ₹35,000.00 is active. Real-time alerts will warn you at 80% usage.',
+    time: '2h ago',
+    timestamp: Date.now() - 7200000,
+    type: 'info',
+    icon: 'shield-checkmark',
+    read: false,
+  },
+  {
+    id: 'notif-seed-2',
+    title: 'Salary Credited 💼',
+    message: 'Primary income of ₹40,000.00 was recorded into your primary wallet.',
+    time: '1d ago',
+    timestamp: Date.now() - 86400000,
+    type: 'success',
+    icon: 'cash',
+    read: true,
+  },
+  {
+    id: 'notif-seed-3',
+    title: 'Vehicle Savings Goal 🚗',
+    message: 'You have accumulated ₹60,000.00 (30%) toward your Electric Car goal.',
+    time: '2d ago',
+    timestamp: Date.now() - 172800000,
+    type: 'success',
+    icon: 'car-sport',
+    read: true,
+  },
+];
 
 export const FinanceContext = createContext();
 
@@ -27,6 +62,7 @@ export const FinanceProvider = ({ children }) => {
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
   const [savingsGoal, setSavingsGoal] = useState(INITIAL_SAVINGS_GOAL);
   const [monthlyBudget, setMonthlyBudget] = useState(35000.00);
+  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
   const [isLoading, setIsLoading] = useState(true);
 
   // Personalized Alert modal state
@@ -39,6 +75,7 @@ export const FinanceProvider = ({ children }) => {
         const storedCat = await AsyncStorage.getItem(CAT_STORAGE_KEY);
         const storedGoal = await AsyncStorage.getItem(GOAL_STORAGE_KEY);
         const storedBudget = await AsyncStorage.getItem(BUDGET_STORAGE_KEY);
+        const storedNotifs = await AsyncStorage.getItem(NOTIF_STORAGE_KEY);
 
         if (storedTx) {
           setTransactions(JSON.parse(storedTx));
@@ -66,6 +103,13 @@ export const FinanceProvider = ({ children }) => {
         } else if (currentUser?.monthlyBudget) {
           setMonthlyBudget(Number(currentUser.monthlyBudget));
         }
+
+        if (storedNotifs) {
+          setNotifications(JSON.parse(storedNotifs));
+        } else {
+          setNotifications(INITIAL_NOTIFICATIONS);
+          await AsyncStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(INITIAL_NOTIFICATIONS));
+        }
       } catch (error) {
         console.error('Failed to load finance data:', error);
       } finally {
@@ -84,6 +128,59 @@ export const FinanceProvider = ({ children }) => {
       console.error('Failed to persist transactions:', e);
     }
   };
+
+  /**
+   * Add a notification to the bell list
+   */
+  const addNotification = async (notifData) => {
+    const newNotif = {
+      id: `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      title: notifData.title,
+      message: notifData.message,
+      time: 'Just now',
+      timestamp: Date.now(),
+      type: notifData.type || 'info', // 'success' | 'warning' | 'danger' | 'info'
+      icon: notifData.icon || 'notifications',
+      read: false,
+    };
+
+    setNotifications((prev) => {
+      const updated = [newNotif, ...prev.slice(0, 29)];
+      AsyncStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(updated)).catch((err) =>
+        console.error('Failed to persist notification:', err)
+      );
+      return updated;
+    });
+
+    return newNotif;
+  };
+
+  /**
+   * Mark all notifications as read (clears unread badge on bell)
+   */
+  const markAllNotificationsAsRead = async () => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, read: true }));
+      AsyncStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(updated)).catch((err) =>
+        console.error('Failed to mark notifications read:', err)
+      );
+      return updated;
+    });
+  };
+
+  /**
+   * Clear all notification history
+   */
+  const clearNotifications = async () => {
+    setNotifications([]);
+    try {
+      await AsyncStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify([]));
+    } catch (err) {
+      console.error('Failed to clear notifications:', err);
+    }
+  };
+
+  const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
 
   /**
    * Calculate monthly financial totals
@@ -130,7 +227,7 @@ export const FinanceProvider = ({ children }) => {
       categoryGroup: txData.categoryGroup || txData.category,
       date: txData.date || new Date().toISOString(),
       time: txData.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      icon: txData.icon || (txData.type === 'income' ? 'wallet-outline' : 'cart-outline'),
+      icon: txData.icon || (txData.type === 'income' ? 'cash' : 'cart'),
       tileColor: txData.tileColor || '#3299FF',
       notes: txData.notes || '',
     };
@@ -162,6 +259,7 @@ export const FinanceProvider = ({ children }) => {
     let alertTitle = 'Transaction Added! 💰';
     let alertMessage = `Hey ${userName}, your ${txData.category} ${txData.type} of ${formatINR(amountVal)} was added. You have ${formatINR(budgetLeft)} left this month.`;
     let alertType = 'success';
+    let alertIcon = txData.type === 'income' ? 'cash' : 'cart';
 
     if (matchedCategory && matchedCategory.budget > 0 && txData.type === 'expense') {
       const catUsagePercent = (catTotalExpense / matchedCategory.budget) * 100;
@@ -169,17 +267,28 @@ export const FinanceProvider = ({ children }) => {
         alertTitle = '⚠️ Category Budget Exceeded!';
         alertMessage = `Hey ${userName}, your ${matchedCategory.displayName} expense pushed spending to ${formatINR(catTotalExpense)}, which exceeds your ${formatINR(matchedCategory.budget)} limit!`;
         alertType = 'danger';
+        alertIcon = 'alert-circle';
       } else if (catUsagePercent >= 80) {
         alertTitle = '⚠️ Category Budget Warning';
         alertMessage = `Hey ${userName}, you've used ${catUsagePercent.toFixed(0)}% of your ${matchedCategory.displayName} budget (${formatINR(catTotalExpense)} / ${formatINR(matchedCategory.budget)}). Be careful!`;
         alertType = 'warning';
+        alertIcon = 'warning';
       }
     }
 
+    // Trigger Popup Modal
     setActiveAlert({
       title: alertTitle,
       message: alertMessage,
       type: alertType,
+    });
+
+    // Record Notification for Bell Icon
+    await addNotification({
+      title: alertTitle,
+      message: alertMessage,
+      type: alertType,
+      icon: alertIcon,
     });
 
     return newTx;
@@ -198,10 +307,20 @@ export const FinanceProvider = ({ children }) => {
     await saveTransactions(newTxList);
 
     const userName = currentUser?.name ? currentUser.name.split(' ')[0] : 'there';
+    const alertTitle = 'Transaction Updated ✏️';
+    const alertMessage = `Hey ${userName}, your transaction "${updatedTx.title}" of ${formatINR(amountVal)} has been updated.`;
+
     setActiveAlert({
-      title: 'Transaction Updated ✏️',
-      message: `Hey ${userName}, your transaction "${updatedTx.title}" of ${formatINR(amountVal)} has been updated.`,
+      title: alertTitle,
+      message: alertMessage,
       type: 'success',
+    });
+
+    await addNotification({
+      title: alertTitle,
+      message: alertMessage,
+      type: 'info',
+      icon: 'create',
     });
   };
 
@@ -215,10 +334,20 @@ export const FinanceProvider = ({ children }) => {
 
     const userName = currentUser?.name ? currentUser.name.split(' ')[0] : 'there';
     const amountStr = target ? ` (${formatINR(Math.abs(target.amount))})` : '';
+    const alertTitle = 'Transaction Deleted 🗑️';
+    const alertMessage = `Hey ${userName}, the transaction "${target?.title || 'item'}"${amountStr} was removed from your records.`;
+
     setActiveAlert({
-      title: 'Transaction Deleted 🗑️',
-      message: `Hey ${userName}, the transaction${amountStr} was removed from your records.`,
+      title: alertTitle,
+      message: alertMessage,
       type: 'warning',
+    });
+
+    await addNotification({
+      title: alertTitle,
+      message: alertMessage,
+      type: 'warning',
+      icon: 'trash',
     });
   };
 
@@ -227,16 +356,31 @@ export const FinanceProvider = ({ children }) => {
     if (!isNaN(val) && val > 0) {
       setMonthlyBudget(val);
       await AsyncStorage.setItem(BUDGET_STORAGE_KEY, String(val));
+
+      await addNotification({
+        title: 'Monthly Budget Updated 🎯',
+        message: `Your monthly budget limit has been set to ${formatINR(val)}.`,
+        type: 'info',
+        icon: 'wallet',
+      });
     }
   };
 
   const updateCategoryBudget = async (categoryId, newBudget) => {
     const val = Number(newBudget);
+    const targetCat = categories.find((c) => c.id === categoryId);
     const updatedCats = categories.map((c) =>
       c.id === categoryId ? { ...c, budget: val } : c
     );
     setCategories(updatedCats);
     await AsyncStorage.setItem(CAT_STORAGE_KEY, JSON.stringify(updatedCats));
+
+    await addNotification({
+      title: 'Category Budget Updated 📊',
+      message: `Budget for ${targetCat?.displayName || 'category'} updated to ${formatINR(val)}.`,
+      type: 'info',
+      icon: 'pie-chart',
+    });
   };
 
   /**
@@ -290,6 +434,11 @@ export const FinanceProvider = ({ children }) => {
         categories,
         savingsGoal,
         monthlyBudget,
+        notifications,
+        unreadNotificationsCount,
+        addNotification,
+        markAllNotificationsAsRead,
+        clearNotifications,
         isLoading,
         activeAlert,
         dismissAlert,
@@ -308,3 +457,4 @@ export const FinanceProvider = ({ children }) => {
 };
 
 export const useFinance = () => useContext(FinanceContext);
+export default FinanceContext;

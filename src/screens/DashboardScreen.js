@@ -40,7 +40,6 @@ export const DashboardScreen = ({ navigation }) => {
   } = useFinance();
 
   const [selectedTimeframe, setSelectedTimeframe] = useState('Weekly');
-  const [notificationVisible, setNotificationVisible] = useState(false);
 
   // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -97,7 +96,6 @@ export const DashboardScreen = ({ navigation }) => {
         budgetPercent={monthlyTotals.budgetUsagePercent}
         budgetGoal={savingsGoal.goalAmount || 200000.0}
         showNotification={true}
-        onNotificationPress={() => setNotificationVisible(true)}
       />
 
       {/* 2. Mint Rounded Sheet overlapping header */}
@@ -228,17 +226,6 @@ export const DashboardScreen = ({ navigation }) => {
         visible={!!activeAlert}
         alertData={activeAlert}
         onDismiss={dismissAlert}
-      />
-
-      {/* Notifications preview modal */}
-      <PersonalizedAlertModal
-        visible={notificationVisible}
-        alertData={{
-          title: 'Notifications 🔔',
-          message: `Active goal (${savingsGoal.target}: ${savingsGoal.percentage}% saved). Your monthly budget usage is at ${monthlyTotals.budgetUsagePercent}%.`,
-          type: monthlyTotals.budgetUsagePercent > 80 ? 'warning' : 'success',
-        }}
-        onDismiss={() => setNotificationVisible(false)}
       />
     </View>
   );

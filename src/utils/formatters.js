@@ -81,3 +81,16 @@ export const getTimeOfDayGreeting = () => {
     return 'Good Evening';
   }
 };
+
+export const formatRelativeTime = (timestamp) => {
+  if (!timestamp) return 'Just now';
+  const now = Date.now();
+  const diffSec = Math.floor((now - Number(timestamp)) / 1000);
+  if (diffSec < 60) return 'Just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}h ago`;
+  const diffDay = Math.floor(diffHour / 24);
+  return `${diffDay}d ago`;
+};

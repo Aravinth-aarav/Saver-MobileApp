@@ -3,12 +3,12 @@
  * Signature Green Top Header for Saver:
  * - Hamburger menu icon (opens Drawer)
  * - "Hi, Welcome Back" (bold dark) + dynamic greeting by time of day + user's name
- * - Notification bell in light circle
+ * - Notification bell in light circle with reactive live badge & notification modal
  * - Total Balance & Total Expense stats in Indian Rupees (₹) with vertical divider
  * - Dynamic Budget Progress Bar with dark % and white remaining goal (₹2,00,000.00)
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { getTimeOfDayGreeting, formatINR } from '../utils/formatters';
 import { BudgetProgressBar } from './ProgressBar';
 import { useAuth } from '../context/AuthContext';
+import { useFinance } from '../context/FinanceContext';
+import { NotificationsModal } from './NotificationsModal';
 
 export const Header = ({
   navigation,
@@ -39,6 +41,8 @@ export const Header = ({
 }) => {
   const dynamicGreeting = getTimeOfDayGreeting();
   const { currentUser } = useAuth();
+  const { unreadNotificationsCount } = useFinance();
+  const [modalVisible, setModalVisible] = useState(false);
   const userName = currentUser?.name ? currentUser.name.split(' ')[0] : 'Priya';
 
   const handleMenuPress = () => {
@@ -50,6 +54,13 @@ export const Header = ({
   const handleBackPress = () => {
     if (navigation && navigation.goBack) {
       navigation.goBack();
+    }
+  };
+
+  const handleBellPress = () => {
+    setModalVisible(true);
+    if (onNotificationPress) {
+      onNotificationPress();
     }
   };
 
@@ -95,15 +106,23 @@ export const Header = ({
             </View>
           </View>
 
-          {/* Right: Notification bell inside light circle */}
+          {/* Right: Notification bell inside light circle with dynamic unread badge */}
           {showNotification && (
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={onNotificationPress}
+              onPress={handleBellPress}
               style={styles.bellCircle}
             >
               <Ionicons name="notifications" size={20} color={colors.darkText} />
-              <View style={styles.notificationDot} />
+              {unreadNotificationsCount > 0 ? (
+                <View style={styles.unreadBadge}>
+                  <Text style={styles.unreadBadgeText}>
+                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.notificationDot} />
+              )}
             </TouchableOpacity>
           )}
         </View>
@@ -134,6 +153,12 @@ export const Header = ({
           </View>
         )}
       </SafeAreaView>
+
+      {/* Live Real-time Activity & Notifications Modal */}
+      <NotificationsModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 };
@@ -214,6 +239,28 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: colors.blueAmount,
+  },
+  unreadBadge: {
+    position: 'absolute',
+    top: 3,
+    right: 3,
+    backgroundColor: '#FF3B30',
+    minWidth: 17,
+    height: 17,
+    borderRadius: 8.5,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: colors.white,
+  },
+  unreadBadgeText: {
+    color: colors.white,
+    fontSize: 9.5,
+    fontFamily: typography.bold,
+    fontWeight: '800',
+    textAlign: 'center',
+    lineHeight: 12,
   },
   statsSection: {
     marginTop: 8,
