@@ -78,10 +78,10 @@ export const ProfileScreen = ({ navigation }) => {
           </Card>
 
           {/* Monthly Budget Card in ₹ */}
-          <Card style={styles.budgetCard}>
+          <Card variant="darkBlue" style={styles.budgetCard}>
             <View style={styles.budgetLeft}>
               <View style={styles.budgetIconCircle}>
-                <Text style={{ fontSize: 22, color: colors.primary, fontWeight: '800' }}>₹</Text>
+                <Text style={styles.budgetIconText}>₹</Text>
               </View>
               <View>
                 <Text style={styles.budgetLabel}>Monthly Budget Limit</Text>

@@ -1,22 +1,24 @@
 /**
  * DashboardScreen.js
  * The main financial dashboard for Saver:
- * 1. Top Green Header: menu icon, "Hi, Welcome Back" + greeting & user name, bell circle,
- *    Total Balance & Total Expense in ₹, budget progress bar with dynamic message.
+ * 1. Top Header: menu icon, greeting & user name, notification bell,
+ *    Total Balance & Total Expense in ₹, budget progress bar.
  * 2. Mint rounded bottom sheet:
- *    a. Green Card with SVG circular ring (car icon, "Savings On Goals"),
+ *    a. Dark Blue Card (Elevated Navy style): SVG circular progress (car-sport icon, "Savings On Goals"),
  *       vertical divider, "Revenue Last Week" (₹42,000.00), "Food Last Week" (-₹1,800.00).
  *    b. Segmented toggle: Daily | Weekly | Monthly (updates report totals & list in real time).
- *    c. Detailed Transaction list in ₹ (blue tile, title, blue time/date, dividers, category, amount).
+ *    c. Detailed Transaction list in ₹ with modern styled icons and press feedback.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   StatusBar,
+  Animated,
+  TouchableOpacity,
 } from 'react-native';
 import { colors, borderRadius, typography, shadows } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -40,6 +42,45 @@ export const DashboardScreen = ({ navigation }) => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('Weekly');
   const [notificationVisible, setNotificationVisible] = useState(false);
 
+  // Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(18)).current;
+  const scaleCardAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        speed: 12,
+        bounciness: 6,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  const handleCardPressIn = () => {
+    Animated.spring(scaleCardAnim, {
+      toValue: 0.97,
+      speed: 20,
+      bounciness: 4,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleCardPressOut = () => {
+    Animated.spring(scaleCardAnim, {
+      toValue: 1,
+      speed: 20,
+      bounciness: 4,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const monthlyTotals = getMonthlyTotals();
   const reportData = getReportData(selectedTimeframe);
 
@@ -47,7 +88,7 @@ export const DashboardScreen = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
 
-      {/* 1. Green Header with Stats & Progress Bar in ₹ */}
+      {/* 1. Header with Stats & Progress Bar in ₹ */}
       <Header
         navigation={navigation}
         showFullStats={true}
@@ -65,53 +106,75 @@ export const DashboardScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.sheetContent}
         >
-          {/* Green Card: Savings On Goals & Last Week Stats in ₹ */}
-          <View style={[styles.greenCard, shadows.card]}>
-            {/* Left: Circular SVG ring with car icon */}
-            <View style={styles.cardLeftCol}>
-              <CircularProgress
-                size={82}
-                strokeWidth={7}
-                percentage={savingsGoal.percentage || 71}
-                iconName="car"
-                ringColor="#052224"
-                trackColor="rgba(255, 255, 255, 0.45)"
-              />
-              <Text style={styles.savingsLabel}>Savings On Goals</Text>
-            </View>
-
-            {/* Vertical Divider */}
-            <View style={styles.cardVerticalDivider} />
-
-            {/* Right: Revenue Last Week & Food Last Week */}
-            <View style={styles.cardRightCol}>
-              <View style={styles.statSubRow}>
-                <View style={styles.statIconBox}>
-                  <Ionicons name="cash-outline" size={18} color="#052224" />
-                </View>
-                <View style={styles.statTextCol}>
-                  <Text style={styles.statSubtitle}>Revenue Last Week</Text>
-                  <Text style={styles.statRevenueAmount}>
-                    {formatINR(savingsGoal.revenueLastWeek, { showExplicitPlus: true })}
-                  </Text>
-                </View>
+          {/* Animated Dark Blue Card: Savings On Goals & Last Week Stats in ₹ */}
+          <Animated.View
+            style={[
+              styles.darkBlueCard,
+              shadows.card,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }, { scale: scaleCardAnim }],
+              },
+            ]}
+          >
+            <TouchableOpacity
+              activeOpacity={0.92}
+              onPressIn={handleCardPressIn}
+              onPressOut={handleCardPressOut}
+              style={styles.cardInnerTouchable}
+            >
+              {/* Left: Circular SVG ring with modern sports car icon */}
+              <View style={styles.cardLeftCol}>
+                <CircularProgress
+                  size={84}
+                  strokeWidth={7.5}
+                  percentage={savingsGoal.percentage || 71}
+                  iconName="car-sport"
+                  iconColor="#FFFFFF"
+                  ringColor={colors.primary}
+                  trackColor="rgba(255, 255, 255, 0.16)"
+                />
+                <Text style={styles.savingsLabel}>Savings On Goals</Text>
+                <Text style={styles.savingsSubBadge}>
+                  {savingsGoal.percentage || 71}% Achieved
+                </Text>
               </View>
 
-              <View style={styles.cardHorizontalDivider} />
+              {/* Vertical Divider */}
+              <View style={styles.cardVerticalDivider} />
 
-              <View style={styles.statSubRow}>
-                <View style={styles.statIconBox}>
-                  <Ionicons name="restaurant-outline" size={18} color="#052224" />
+              {/* Right: Revenue Last Week & Food Last Week */}
+              <View style={styles.cardRightCol}>
+                {/* Revenue Row */}
+                <View style={styles.statSubRow}>
+                  <View style={[styles.statIconBox, { backgroundColor: 'rgba(52, 211, 153, 0.15)' }]}>
+                    <Ionicons name="trending-up" size={18} color="#34D399" />
+                  </View>
+                  <View style={styles.statTextCol}>
+                    <Text style={styles.statSubtitle}>Revenue Last Week</Text>
+                    <Text style={styles.statRevenueAmount}>
+                      {formatINR(savingsGoal.revenueLastWeek, { showExplicitPlus: true })}
+                    </Text>
+                  </View>
                 </View>
-                <View style={styles.statTextCol}>
-                  <Text style={styles.statSubtitle}>Food Last Week</Text>
-                  <Text style={styles.statFoodAmount}>
-                    {formatINR(savingsGoal.foodLastWeek)}
-                  </Text>
+
+                <View style={styles.cardHorizontalDivider} />
+
+                {/* Food Row */}
+                <View style={styles.statSubRow}>
+                  <View style={[styles.statIconBox, { backgroundColor: 'rgba(248, 113, 113, 0.15)' }]}>
+                    <Ionicons name="fast-food" size={18} color="#F87171" />
+                  </View>
+                  <View style={styles.statTextCol}>
+                    <Text style={styles.statSubtitle}>Food Last Week</Text>
+                    <Text style={styles.statFoodAmount}>
+                      {formatINR(savingsGoal.foodLastWeek)}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          </View>
+            </TouchableOpacity>
+          </Animated.View>
 
           {/* Segmented Toggle: Daily | Weekly | Monthly */}
           <SegmentedToggle
@@ -135,7 +198,7 @@ export const DashboardScreen = ({ navigation }) => {
           {/* Detailed Transaction List in ₹ */}
           {reportData.transactions.length === 0 ? (
             <View style={styles.emptyStateContainer}>
-              <Ionicons name="receipt-outline" size={42} color={colors.textLight} />
+              <Ionicons name="receipt" size={42} color={colors.textLight} />
               <Text style={styles.emptyStateTitle}>No Transactions Recorded</Text>
               <Text style={styles.emptyStateSub}>
                 There are no transactions recorded for {selectedTimeframe.toLowerCase()} view.
@@ -199,15 +262,19 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 40,
   },
-  greenCard: {
-    backgroundColor: colors.primary,
+  darkBlueCard: {
+    backgroundColor: colors.darkBlueCard || '#0D2B52',
     borderRadius: borderRadius.card,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.14)',
+    overflow: 'hidden',
+  },
+  cardInnerTouchable: {
     flexDirection: 'row',
     padding: 18,
     alignItems: 'center',
-    marginBottom: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    width: '100%',
   },
   cardLeftCol: {
     flex: 1,
@@ -215,17 +282,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   savingsLabel: {
-    fontFamily: typography.semiBold,
+    fontFamily: typography.bold,
     fontWeight: '700',
-    fontSize: 12.5,
-    color: colors.darkText,
+    fontSize: 13,
+    color: '#FFFFFF',
     marginTop: 8,
     textAlign: 'center',
   },
+  savingsSubBadge: {
+    fontFamily: typography.medium,
+    fontSize: 10.5,
+    color: '#34D399',
+    marginTop: 2,
+    fontWeight: '600',
+  },
   cardVerticalDivider: {
-    width: 1.5,
-    height: 90,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    width: 1,
+    height: 94,
+    backgroundColor: 'rgba(255, 255, 255, 0.16)',
     marginHorizontal: 12,
   },
   cardRightCol: {
@@ -235,13 +309,12 @@ const styles = StyleSheet.create({
   statSubRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingVertical: 5,
   },
   statIconBox: {
-    width: 32,
-    height: 32,
+    width: 34,
+    height: 34,
     borderRadius: borderRadius.sm,
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -253,25 +326,24 @@ const styles = StyleSheet.create({
     fontFamily: typography.medium,
     fontWeight: '500',
     fontSize: 11,
-    color: colors.darkText,
-    opacity: 0.85,
+    color: '#94A3B8',
   },
   statRevenueAmount: {
     fontFamily: typography.bold,
     fontWeight: '800',
-    fontSize: 15,
-    color: colors.darkText,
+    fontSize: 15.5,
+    color: '#34D399',
   },
   statFoodAmount: {
     fontFamily: typography.bold,
     fontWeight: '800',
-    fontSize: 15,
-    color: colors.blueAmount,
+    fontSize: 15.5,
+    color: '#F87171',
   },
   cardHorizontalDivider: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
-    marginVertical: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    marginVertical: 7,
     width: '100%',
   },
   timeframeSummaryRow: {

@@ -119,7 +119,7 @@ export const AnalysisScreen = ({ navigation }) => {
           <View style={styles.kpiRow}>
             <View style={[styles.kpiCard, shadows.card]}>
               <View style={[styles.kpiIcon, { backgroundColor: '#E2FBE9' }]}>
-                <Ionicons name="arrow-down" size={18} color={colors.primary} />
+                <Ionicons name="arrow-down-circle" size={18} color={colors.primary} />
               </View>
               <Text style={styles.kpiLabel}>Total Income</Text>
               <Text style={styles.kpiValueIncome}>
@@ -129,7 +129,7 @@ export const AnalysisScreen = ({ navigation }) => {
 
             <View style={[styles.kpiCard, shadows.card]}>
               <View style={[styles.kpiIcon, { backgroundColor: '#E8F2FF' }]}>
-                <Ionicons name="arrow-up" size={18} color={colors.blueAmount} />
+                <Ionicons name="arrow-up-circle" size={18} color={colors.blueAmount} />
               </View>
               <Text style={styles.kpiLabel}>Total Expense</Text>
               <Text style={styles.kpiValueExpense}>
@@ -141,7 +141,7 @@ export const AnalysisScreen = ({ navigation }) => {
           <View style={styles.kpiRow}>
             <View style={[styles.kpiCard, shadows.card]}>
               <View style={[styles.kpiIcon, { backgroundColor: '#E6F8F3' }]}>
-                <Ionicons name="wallet-outline" size={18} color={colors.darkText} />
+                <Ionicons name="wallet" size={18} color={colors.darkText} />
               </View>
               <Text style={styles.kpiLabel}>Total Balance</Text>
               <Text style={styles.kpiValueBalance}>
@@ -170,7 +170,7 @@ export const AnalysisScreen = ({ navigation }) => {
               ]}
             >
               <Ionicons
-                name="pie-chart-outline"
+                name="pie-chart"
                 size={16}
                 color={selectedChartType === 'categories' ? colors.white : colors.darkText}
                 style={{ marginRight: 6 }}
@@ -193,7 +193,7 @@ export const AnalysisScreen = ({ navigation }) => {
               ]}
             >
               <Ionicons
-                name="bar-chart-outline"
+                name="bar-chart"
                 size={16}
                 color={selectedChartType === 'comparison' ? colors.white : colors.darkText}
                 style={{ marginRight: 6 }}

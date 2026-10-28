@@ -1,16 +1,13 @@
 /**
  * TransactionItem.js
- * Single transaction list row matching reference layout:
- * - Rounded-square blue icon tile
- * - Bold title
- * - Small blue bold time and date (e.g. 18:27 - April 30)
- * - Vertical divider
- * - Category text (Monthly / Pantry / Rent)
- * - Amount in Indian Rupees (₹) on the right (income dark, expenses blue with minus: -₹1,000.00)
+ * Enhanced single transaction row with:
+ * - Solid styled modern icons
+ * - Spring touch animation
+ * - Clean metadata, dividers, and Rupee (₹) formatting
  */
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { colors, borderRadius, typography } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { formatINR, formatDateTime } from '../utils/formatters';
@@ -27,9 +24,29 @@ export const TransactionItem = ({
     category,
     date,
     time,
-    icon = 'wallet-outline',
+    icon = 'wallet',
     tileColor = colors.iconTileBlueMedium,
   } = transaction;
+
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.975,
+      speed: 24,
+      bounciness: 4,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      speed: 24,
+      bounciness: 4,
+      useNativeDriver: true,
+    }).start();
+  };
 
   const isIncome = type === 'income' || amount > 0;
   const numAmount = Number(amount);
@@ -47,62 +64,67 @@ export const TransactionItem = ({
     formattedTimeDate = formatDateTime(date) || '18:27 - April 30';
   }
 
+  // Modern solid styled icons
   const resolveIconName = (name) => {
-    if (!name) return 'receipt-outline';
-    if (name.includes('car')) return 'car-outline';
-    if (name.includes('cart') || name.includes('pantry') || name.includes('grocer')) return 'cart-outline';
-    if (name.includes('wallet') || name.includes('salary') || name.includes('cash')) return 'cash-outline';
-    if (name.includes('home') || name.includes('rent')) return 'home-outline';
-    if (name.includes('cafe') || name.includes('food')) return 'restaurant-outline';
-    if (name.includes('bill') || name.includes('flash')) return 'flash-outline';
-    if (name.includes('medkit') || name.includes('health') || name.includes('pharmacy')) return 'medkit-outline';
-    if (name.includes('film') || name.includes('movie')) return 'film-outline';
-    return name;
+    if (!name) return 'receipt';
+    if (name.includes('car')) return 'car-sport';
+    if (name.includes('cart') || name.includes('pantry') || name.includes('grocer')) return 'cart';
+    if (name.includes('wallet') || name.includes('salary') || name.includes('cash')) return 'cash';
+    if (name.includes('home') || name.includes('rent')) return 'home';
+    if (name.includes('cafe') || name.includes('food')) return 'fast-food';
+    if (name.includes('bill') || name.includes('flash')) return 'flash';
+    if (name.includes('medkit') || name.includes('health') || name.includes('pharmacy')) return 'medical';
+    if (name.includes('film') || name.includes('movie')) return 'videocam';
+    return name.replace('-outline', '');
   };
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.75}
-      onPress={onPress}
-      onLongPress={onLongPress}
-      style={styles.container}
-    >
-      {/* 1. Rounded-Square Blue Icon Tile */}
-      <View style={[styles.iconTile, { backgroundColor: tileBg }]}>
-        <Ionicons name={resolveIconName(icon)} size={22} color={colors.white} />
-      </View>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        activeOpacity={0.88}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onLongPress={onLongPress}
+        style={styles.container}
+      >
+        {/* 1. Rounded-Square Blue Icon Tile with shadow */}
+        <View style={[styles.iconTile, { backgroundColor: tileBg, shadowColor: tileBg }]}>
+          <Ionicons name={resolveIconName(icon)} size={22} color={colors.white} />
+        </View>
 
-      {/* 2. Middle Details */}
-      <View style={styles.detailsContainer}>
-        <Text style={styles.title} numberOfLines={1}>
-          {title}
-        </Text>
-
-        <View style={styles.metaRow}>
-          <Text style={styles.timeDateText}>
-            {formattedTimeDate}
+        {/* 2. Middle Details */}
+        <View style={styles.detailsContainer}>
+          <Text style={styles.title} numberOfLines={1}>
+            {title}
           </Text>
 
-          <View style={styles.metaDivider} />
+          <View style={styles.metaRow}>
+            <Text style={styles.timeDateText}>
+              {formattedTimeDate}
+            </Text>
 
-          <Text style={styles.categoryText} numberOfLines={1}>
-            {category}
+            <View style={styles.metaDivider} />
+
+            <Text style={styles.categoryText} numberOfLines={1}>
+              {category}
+            </Text>
+          </View>
+        </View>
+
+        {/* 3. Amount on Right: Income dark, Expenses blue with minus */}
+        <View style={styles.amountContainer}>
+          <Text
+            style={[
+              styles.amountText,
+              isIncome ? styles.incomeText : styles.expenseText,
+            ]}
+          >
+            {formatINR(numAmount, { showExplicitPlus: true })}
           </Text>
         </View>
-      </View>
-
-      {/* 3. Amount on Right: Income dark, Expenses blue with minus */}
-      <View style={styles.amountContainer}>
-        <Text
-          style={[
-            styles.amountText,
-            isIncome ? styles.incomeText : styles.expenseText,
-          ]}
-        >
-          {formatINR(numAmount, { showExplicitPlus: true })}
-        </Text>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -119,9 +141,9 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(5, 34, 36, 0.04)',
     shadowColor: '#052224',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.03,
+    shadowOpacity: 0.04,
     shadowRadius: 6,
-    elevation: 1.5,
+    elevation: 2,
   },
   iconTile: {
     width: 46,
@@ -130,6 +152,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
   },
   detailsContainer: {
     flex: 1,
@@ -155,7 +181,7 @@ const styles = StyleSheet.create({
   metaDivider: {
     width: 1,
     height: 11,
-    backgroundColor: 'rgba(5, 34, 36, 0.25)',
+    backgroundColor: 'rgba(5, 34, 36, 0.22)',
     marginHorizontal: 8,
   },
   categoryText: {

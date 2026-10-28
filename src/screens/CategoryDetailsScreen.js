@@ -97,7 +97,7 @@ export const CategoryDetailsScreen = ({ route, navigation }) => {
           )}
 
           {/* Stats Card: Total Spent & Budget Left in ₹ */}
-          <Card style={styles.statsCard}>
+          <Card variant="darkBlue" style={styles.statsCard}>
             <View style={styles.statsTopRow}>
               <View>
                 <Text style={styles.statLabel}>Total Spent</Text>
@@ -231,8 +231,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statsCard: {
+    backgroundColor: colors.darkBlueCard || '#0D2B52',
     padding: 18,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.14)',
   },
   statsTopRow: {
     flexDirection: 'row',
@@ -243,25 +246,25 @@ const styles = StyleSheet.create({
   statLabel: {
     fontFamily: typography.medium,
     fontSize: 12,
-    color: colors.textMuted,
+    color: '#94A3B8',
     marginBottom: 4,
   },
   statSpentValue: {
     fontFamily: typography.bold,
     fontWeight: '800',
     fontSize: 22,
-    color: colors.blueAmount,
+    color: '#FFFFFF',
   },
   statLeftValue: {
     fontFamily: typography.bold,
     fontWeight: '800',
     fontSize: 22,
-    color: colors.primaryDark,
+    color: '#34D399',
   },
   statDivider: {
     width: 1,
     height: 42,
-    backgroundColor: 'rgba(5, 34, 36, 0.08)',
+    backgroundColor: 'rgba(255, 255, 255, 0.16)',
   },
   progressContainer: {
     marginTop: 6,
@@ -274,13 +277,13 @@ const styles = StyleSheet.create({
   progressMetaLabel: {
     fontFamily: typography.regular,
     fontSize: 12,
-    color: colors.textMuted,
+    color: '#94A3B8',
   },
   progressMetaPercent: {
     fontFamily: typography.bold,
     fontWeight: '700',
     fontSize: 12,
-    color: colors.darkText,
+    color: '#38BDF8',
   },
   chartCard: {
     padding: 14,

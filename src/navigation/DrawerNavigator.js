@@ -1,3 +1,4 @@
+import { SafeAreaView } from 'react-native-safe-area-context';
 /**
  * DrawerNavigator.js
  * Drawer wrapping the BottomTabNavigator for Saver:
@@ -13,7 +14,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
+  
 } from 'react-native';
 import {
   createDrawerNavigator,
@@ -60,7 +61,7 @@ function CustomDrawerContent(props) {
           onPress={() => props.navigation.navigate('MainTabs', { screen: 'DashboardTab' })}
         >
           <View style={[styles.itemIconBox, { backgroundColor: '#E2FBE9' }]}>
-            <Ionicons name="home-outline" size={20} color={colors.primary} />
+            <Ionicons name="home" size={20} color={colors.primary} />
           </View>
           <Text style={styles.drawerItemText}>Dashboard</Text>
         </TouchableOpacity>
@@ -72,7 +73,7 @@ function CustomDrawerContent(props) {
             onPress={() => props.navigation.navigate('MainTabs', { screen: 'ProfileTab' })}
           >
             <View style={[styles.itemIconBox, { backgroundColor: '#E8F2FF' }]}>
-              <Ionicons name="person-outline" size={20} color={colors.blueAmount} />
+              <Ionicons name="person" size={20} color={colors.blueAmount} />
             </View>
             <Text style={styles.drawerItemText}>Profile & Settings</Text>
           </TouchableOpacity>
@@ -84,7 +85,7 @@ function CustomDrawerContent(props) {
           onPress={() => props.navigation.navigate('About')}
         >
           <View style={[styles.itemIconBox, { backgroundColor: '#FFF4E0' }]}>
-            <Ionicons name="information-circle-outline" size={20} color={colors.warning} />
+            <Ionicons name="information-circle" size={20} color={colors.warning} />
           </View>
           <Text style={styles.drawerItemText}>About Saver</Text>
         </TouchableOpacity>
@@ -100,7 +101,7 @@ function CustomDrawerContent(props) {
           }}
         >
           <View style={[styles.itemIconBox, { backgroundColor: '#FFEBEB' }]}>
-            <Ionicons name="log-out-outline" size={20} color={colors.danger} />
+            <Ionicons name="log-out" size={20} color={colors.danger} />
           </View>
           <Text style={[styles.drawerItemText, { color: colors.danger }]}>
             Logout

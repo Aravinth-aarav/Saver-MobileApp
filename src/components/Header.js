@@ -74,7 +74,7 @@ export const Header = ({
                 onPress={handleMenuPress}
                 style={styles.circleIconButton}
               >
-                <Ionicons name="menu-outline" size={24} color={colors.darkText} />
+                <Ionicons name="menu" size={24} color={colors.darkText} />
               </TouchableOpacity>
             )}
 
@@ -102,7 +102,7 @@ export const Header = ({
               onPress={onNotificationPress}
               style={styles.bellCircle}
             >
-              <Ionicons name="notifications-outline" size={20} color={colors.darkText} />
+              <Ionicons name="notifications" size={20} color={colors.darkText} />
               <View style={styles.notificationDot} />
             </TouchableOpacity>
           )}

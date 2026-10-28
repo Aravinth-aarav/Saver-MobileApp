@@ -1,7 +1,7 @@
 /**
  * LoginScreen.js
  * Login screen for Saver with role selector (Customer vs Admin),
- * 1-tap demo credentials autofill, and inline red error validation.
+ * inline red error validation.
  */
 
 import React, { useState } from 'react';
@@ -30,19 +30,6 @@ export const LoginScreen = ({ navigation }) => {
   const [errors, setErrors] = useState({});
   const [authError, setAuthError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const fillDemo = (userRole) => {
-    setRole(userRole);
-    setErrors({});
-    setAuthError('');
-    if (userRole === 'admin') {
-      setEmail('admin@demo.com');
-      setPassword('Admin@123');
-    } else {
-      setEmail('customer@demo.com');
-      setPassword('Customer@123');
-    }
-  };
 
   const handleLogin = async () => {
     setAuthError('');
@@ -142,26 +129,6 @@ export const LoginScreen = ({ navigation }) => {
                 </Text>
               </TouchableOpacity>
             </View>
-
-            {/* Quick Demo Autofill Chips */}
-            <View style={styles.quickFillRow}>
-              <Text style={styles.quickFillLabel}>1-Tap Fill:</Text>
-              <TouchableOpacity
-                onPress={() => fillDemo('customer')}
-                style={styles.demoChip}
-              >
-                <Text style={styles.demoChipText}>Customer Demo</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => fillDemo('admin')}
-                style={[styles.demoChip, { borderColor: colors.blueAmount }]}
-              >
-                <Text style={[styles.demoChipText, { color: colors.blueAmount }]}>
-                  Admin Demo
-                </Text>
-              </TouchableOpacity>
-            </View>
-
             {/* Auth Error Banner */}
             {authError ? (
               <View style={styles.authErrorBox}>
@@ -278,33 +245,6 @@ const styles = StyleSheet.create({
   roleTextActive: {
     color: colors.white,
     fontWeight: '700',
-  },
-  quickFillRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 18,
-    paddingHorizontal: 4,
-  },
-  quickFillLabel: {
-    fontFamily: typography.regular,
-    fontSize: 12,
-    color: colors.textMuted,
-    marginRight: 8,
-  },
-  demoChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: borderRadius.pill,
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    marginRight: 8,
-  },
-  demoChipText: {
-    fontFamily: typography.semiBold,
-    fontSize: 11.5,
-    fontWeight: '600',
-    color: colors.primaryDark,
   },
   authErrorBox: {
     flexDirection: 'row',

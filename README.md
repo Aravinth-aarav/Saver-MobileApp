@@ -203,54 +203,17 @@ npx expo start
 
 ---
 
-## 📤 GitHub Push Commands
+## 📤 GitHub Repository
 
-To publish this project to a new public GitHub repository:
+Public Repository: [https://github.com/Aravinth-aarav/Saver-MobileApp.git](https://github.com/Aravinth-aarav/Saver-MobileApp.git)
 
 ```bash
 # 1. Verify git status
 git status
 
-# 2. Add your remote repository URL (replace <YOUR_USERNAME> and <REPO_NAME>)
-git remote add origin https://github.com/<YOUR_USERNAME>/<REPO_NAME>.git
+# 2. Add remote repository URL
+git remote add origin https://github.com/Aravinth-aarav/Saver-MobileApp.git
 
 # 3. Push to main branch
 git push -u origin main
 ```
-
----
-
-## 🎯 Exam Feature Mapping & Scoring Breakdown
-
-| Marks Category | Feature Description | Implementation Details | Status |
-|---|---|---|:---:|
-| **30 Marks** | **Tri-Navigation Architecture** | Native Stack (`RootNavigator`), Custom Floating Bottom Tabs (`BottomTabNavigator`), Left Edge Swipe Drawer (`DrawerNavigator`). | ✅ 100% Complete |
-| **15 Marks** | **Functional Requirements** | Personalized alerts on add/edit/delete in ₹, 80%/100% budget alerts, Daily/Weekly/Monthly reports, live data sync across all screens. | ✅ 100% Complete |
-| **UI & Identity** | **Saver App & Rupee (₹) System** | Custom `<Logo />` in code, `formatINR()` pure JS Indian digit grouping without Intl, realistic amounts (Salary ₹40,000, Rent ₹6,740, balance ₹77,830). | ✅ 100% Complete |
-| **Flow** | **Landing Screen & Auth Flow** | Home landing screen shows ONLY Logo + tagline + Login & Sign Up buttons (no auto-login). Successful auth transitions directly to Dashboard. | ✅ 100% Complete |
-| **Roles** | **Role-Based Access Control** | Customer sees all 5 tabs; Admin sees only Dashboard and Analysis tabs. Demo logins with 1-tap fill. | ✅ 100% Complete |
-| **Validation** | **Inline Red Error Messages** | Strict regex email, 10-digit phone, password min 6 chars, amount > 0, displayed directly below inputs. | ✅ 100% Complete |
-
----
-
-## 📸 Screenshot Checklist for Word Document
-
-Use this checklist to capture every screenshot required for your hackathon exam submission report:
-
-- [ ] **Screenshot 1: Home (Landing Screen)** — Showing the Saver logo (rupee symbol ₹ in green badge), "Saver" brand text, tagline *"Save smart. Spend wise."*, and Login / Sign Up buttons.
-- [ ] **Screenshot 2: Login Screen (Customer)** — Role selector set to Customer with 1-tap demo chips and input fields.
-- [ ] **Screenshot 3: Login Screen (Admin)** — Role selector set to Admin.
-- [ ] **Screenshot 4: Sign Up Screen with Inline Validation Errors** — Showing red inline error text under invalid fields (e.g. invalid email, phone not 10 digits, password mismatch).
-- [ ] **Screenshot 5: Dashboard Screen (Customer)** — Top green header with greeting (*"Good Morning, Priya"*), Total Balance (`₹77,830.00`), Total Expense (`-₹17,170.00`), budget progress bar, savings card (car icon + SVG ring), Daily/Weekly/Monthly toggle, and transaction rows.
-- [ ] **Screenshot 6: Navigation Drawer Open** — Swiped from left showing user header (Priya Sharma, Customer), Dashboard, Profile & Settings, About Saver, and Logout links.
-- [ ] **Screenshot 7: Analysis Screen** — Showing Category Donut Chart, Monthly Income vs Expense Bar Chart, and summary KPI cards in ₹.
-- [ ] **Screenshot 8: Analysis Screen (Admin Mode)** — Logged in as Admin showing the blue "Admin View Active" banner and 2 tabs on bottom bar.
-- [ ] **Screenshot 9: Transactions Screen** — Month selector (*May 2026*), date-grouped list, monthly totals banner, and "+ Add Transaction" floating button.
-- [ ] **Screenshot 10: Add Transaction Modal** — Modal open showing Title, Amount (₹), Category picker chips, and Date input.
-- [ ] **Screenshot 11: Personalized Alert Modal** — Showing feedback popup: *"Hey Priya, your Food expense of ₹500.00 was added. You have ₹25,000.00 left this month."*
-- [ ] **Screenshot 12: Category Budget Warning Modal (80% / 100%)** — Showing proactive alert: *"⚠️ Category Budget Warning: You've used 85% of your Food budget!"*
-- [ ] **Screenshot 13: Categories Screen** — Grid of 6 categories (Food, Transport, Shopping, Bills, Health, Entertainment) with progress bars.
-- [ ] **Screenshot 14: Category Details Screen** — Detailed category view with Total Spent, Budget Left, consumption gauge chart, and category transactions list.
-- [ ] **Screenshot 15: Profile & Edit Profile Screens** — Customer profile card, monthly budget limit card in ₹, and edit form with Save button.
-- [ ] **Screenshot 16: About Saver Screen** — Exam verification checklist and tech stack badges.
-- [ ] **Screenshot 17: Logout Action** — Demonstrating that tapping Logout resets authentication and brings the user back to the Home landing screen.

@@ -8,18 +8,24 @@
     "userInterfaceStyle": "light",
     "splash": {
       "resizeMode": "contain",
-      "backgroundColor": "#00D09E"
+      "backgroundColor": "#00D09E",
+      "image": "./assets/splash.png"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#00D09E"
+        "backgroundColor": "#00D09E",
+        "foregroundImage": "./assets/adaptive-icon.png"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font",
+      "expo-status-bar"
+    ]
   }
 }

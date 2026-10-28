@@ -6,36 +6,47 @@
 
 export const colors = {
   // Brand & Backgrounds
-  primary: '#00D09E',            // Fresh fintech green
-  primaryDark: '#00B589',        // Darker green for press state
+  primary: '#38BDF8',            // Fresh fintech green
+  primaryDark: '#38BDF8',        // Darker green for press state
   background: '#F1FFF3',         // Mint background
   surface: '#FFFFFF',            // Card white
   lightGreen: '#DFF7E2',         // Light green for nav bar / toggle background
   lightGreenSoft: '#EBFBEF',     // Softer mint tint
-  
+
+  // Dark Blue Cards & Surfaces (Modern Navy Fintech)
+  darkBlue: '#1e698dff',           // Deep royal dark blue
+  darkBlueCard: '#055071ff',       // Sleek rich dark navy card
+  darkBlueCardElevated: '#144c68ff', // Inner highlights on dark blue
+  darkBlueCardBorder: '#144c68ff',
+  cardTextWhite: '#FFFFFF',
+  cardTextSilver: '#94A3B8',
+  cardTextMuted: '#64748B',
+  accentCyan: '#38BDF8',
+  accentEmerald: '#00c08fff',
+
   // Typography
   darkText: '#052224',           // Primary dark text
   textMuted: '#5E7A7D',          // Secondary muted text
   textLight: '#8CA4A6',          // Inactive / subtle text
-  white: '#FFFFFF',
-  
+  white: '#fdfefe',
+
   // Accents & Amounts
   blueAmount: '#0068FF',         // Blue for expense amounts
   blueLight: '#E8F2FF',          // Blue background tint
   incomeGreen: '#00B386',        // Positive income color
-  
+
   // Icon Tile Blues
-  iconTileBlueLight: '#6DB6FE',
-  iconTileBlueMedium: '#3299FF',
+  iconTileBlueLight: '#02ffff',
+  iconTileBlueMedium: '#01f4f4ff',
   iconTileBlueDark: '#0068FF',
-  
+
   // Status Colors
   danger: '#FF4D4D',             // Red for errors & budget alerts (>100%)
   dangerLight: '#FFEAEA',
   warning: '#FFA800',            // Orange for budget warning (50-80%)
   warningLight: '#FFF4E0',
-  success: '#00D09E',            // Green for under 50%
-  
+  success: '#026a52ff',            // Green for under 50%
+
   // Borders & Dividers
   borderLight: '#DCEFE1',
   divider: 'rgba(5, 34, 36, 0.08)',

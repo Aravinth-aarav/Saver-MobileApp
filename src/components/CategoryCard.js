@@ -1,10 +1,13 @@
 /**
  * CategoryCard.js
- * Grid item displaying category icon tile, name, amount spent vs budget in ₹, and progress bar
+ * Enhanced Category Card with:
+ * - Modern solid filled icons (fast-food, car-sport, cart, receipt, medical, videocam)
+ * - Tactile spring press animation
+ * - Glowing icon tile and clean typography
  */
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { colors, borderRadius, typography, shadows } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { formatINR } from '../utils/formatters';
@@ -21,6 +24,27 @@ export const CategoryCard = ({
   const numSpent = Math.abs(spent);
   const percent = budget > 0 ? (numSpent / budget) * 100 : 0;
 
+  // Press Animation
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.965,
+      speed: 22,
+      bounciness: 4,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      speed: 22,
+      bounciness: 4,
+      useNativeDriver: true,
+    }).start();
+  };
+
   // Status tag
   let badgeText = 'Normal';
   let badgeColor = colors.primary;
@@ -36,68 +60,73 @@ export const CategoryCard = ({
     badgeBg = '#FFF4DE';
   }
 
+  // Modern styled filled icons
   const resolveCategoryIcon = (icName) => {
     switch (icName) {
       case 'restaurant':
-        return 'restaurant-outline';
+        return 'fast-food';
       case 'car':
-        return 'car-outline';
+        return 'car-sport';
       case 'cart':
-        return 'cart-outline';
+        return 'cart';
       case 'receipt':
-        return 'receipt-outline';
+        return 'receipt';
       case 'medkit':
-        return 'medkit-outline';
+        return 'medical';
       case 'film':
-        return 'film-outline';
+        return 'videocam';
       default:
-        return 'pricetag-outline';
+        return 'pricetag';
     }
   };
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.85}
-      onPress={onPress}
-      style={[styles.card, shadows.card, style]}
-    >
-      {/* Top row: Icon tile & Status badge */}
-      <View style={styles.topRow}>
-        <View style={[styles.iconTile, { backgroundColor: color }]}>
-          <Ionicons name={resolveCategoryIcon(icon)} size={22} color={colors.white} />
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={[styles.card, shadows.card, style]}
+      >
+        {/* Top row: Styled Icon tile & Status badge */}
+        <View style={styles.topRow}>
+          <View style={[styles.iconTile, { backgroundColor: color, shadowColor: color }]}>
+            <Ionicons name={resolveCategoryIcon(icon)} size={22} color={colors.white} />
+          </View>
+
+          <View style={[styles.badge, { backgroundColor: badgeBg }]}>
+            <Text style={[styles.badgeText, { color: badgeColor }]}>{badgeText}</Text>
+          </View>
         </View>
 
-        <View style={[styles.badge, { backgroundColor: badgeBg }]}>
-          <Text style={[styles.badgeText, { color: badgeColor }]}>{badgeText}</Text>
-        </View>
-      </View>
+        {/* Title & Count */}
+        <Text style={styles.categoryName} numberOfLines={1}>
+          {displayName || name}
+        </Text>
+        <Text style={styles.txCount}>
+          {transactionCount} {transactionCount === 1 ? 'transaction' : 'transactions'}
+        </Text>
 
-      {/* Title & Count */}
-      <Text style={styles.categoryName} numberOfLines={1}>
-        {displayName || name}
-      </Text>
-      <Text style={styles.txCount}>
-        {transactionCount} {transactionCount === 1 ? 'transaction' : 'transactions'}
-      </Text>
-
-      {/* Progress Bar */}
-      <View style={styles.progressSection}>
-        <CategoryProgressBar percent={percent} height={7} />
-      </View>
-
-      {/* Bottom Numbers: Spent & Budget */}
-      <View style={styles.bottomRow}>
-        <View>
-          <Text style={styles.spentLabel}>Spent</Text>
-          <Text style={styles.spentValue}>{formatINR(numSpent)}</Text>
+        {/* Progress Bar */}
+        <View style={styles.progressSection}>
+          <CategoryProgressBar percent={percent} height={7.5} />
         </View>
 
-        <View style={styles.rightStat}>
-          <Text style={styles.budgetLabel}>Budget</Text>
-          <Text style={styles.budgetValue}>{formatINR(budget)}</Text>
+        {/* Bottom Numbers: Spent & Budget */}
+        <View style={styles.bottomRow}>
+          <View>
+            <Text style={styles.spentLabel}>Spent</Text>
+            <Text style={styles.spentValue}>{formatINR(numSpent)}</Text>
+          </View>
+
+          <View style={styles.rightStat}>
+            <Text style={styles.budgetLabel}>Budget</Text>
+            <Text style={styles.budgetValue}>{formatINR(budget)}</Text>
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -117,11 +146,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   iconTile: {
-    width: 44,
-    height: 44,
+    width: 46,
+    height: 46,
     borderRadius: borderRadius.iconTile,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 3,
   },
   badge: {
     paddingHorizontal: 10,
@@ -165,7 +198,7 @@ const styles = StyleSheet.create({
   spentValue: {
     fontFamily: typography.bold,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 14.5,
     color: colors.blueAmount,
   },
   rightStat: {
@@ -179,7 +212,7 @@ const styles = StyleSheet.create({
   budgetValue: {
     fontFamily: typography.bold,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 14.5,
     color: colors.darkText,
   },
 });
