@@ -1,0 +1,191 @@
+/**
+ * TransactionItem.js
+ * Single transaction list row matching the exact reference layout:
+ * - Rounded-square blue icon tile
+ * - Bold title
+ * - Small blue bold time and date (e.g. 18:27 - April 30)
+ * - Vertical divider
+ * - Category text (Monthly / Pantry / Rent)
+ * - Amount on the right (income dark, expenses blue with minus)
+ */
+
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { colors, borderRadius, typography } from '../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { formatCurrency, formatDateTime } from '../utils/formatters';
+
+export const TransactionItem = ({
+  transaction,
+  onPress,
+  onLongPress,
+}) => {
+  const {
+    title,
+    amount,
+    type,
+    category,
+    date,
+    time,
+    icon = 'wallet-outline',
+    tileColor = colors.iconTileBlueMedium,
+  } = transaction;
+
+  const isIncome = type === 'income' || amount > 0;
+  const numAmount = Number(amount);
+
+  // Pick appropriate icon tile color if not set
+  const tileBg = tileColor || (isIncome ? colors.iconTileBlueDark : colors.iconTileBlueMedium);
+
+  // Time & Date format: "18:27 - April 30"
+  let formattedTimeDate = '';
+  if (time && date) {
+    const d = new Date(date);
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    formattedTimeDate = `${time} - ${monthNames[d.getMonth()] || 'Apr'} ${d.getDate() || '30'}`;
+  } else {
+    formattedTimeDate = formatDateTime(date) || '18:27 - April 30';
+  }
+
+  // Pick icon dynamically if icon is string
+  const resolveIconName = (name) => {
+    if (!name) return 'receipt-outline';
+    if (name.includes('car')) return 'car-outline';
+    if (name.includes('cart') || name.includes('pantry')) return 'cart-outline';
+    if (name.includes('wallet') || name.includes('salary')) return 'cash-outline';
+    if (name.includes('home') || name.includes('rent')) return 'home-outline';
+    if (name.includes('cafe') || name.includes('food')) return 'restaurant-outline';
+    if (name.includes('bill') || name.includes('flash')) return 'flash-outline';
+    if (name.includes('medkit') || name.includes('health')) return 'medkit-outline';
+    if (name.includes('film') || name.includes('movie')) return 'film-outline';
+    return name;
+  };
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.75}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      style={styles.container}
+    >
+      {/* 1. Rounded-Square Blue Icon Tile */}
+      <View style={[styles.iconTile, { backgroundColor: tileBg }]}>
+        <Ionicons name={resolveIconName(icon)} size={22} color={colors.white} />
+      </View>
+
+      {/* 2. Middle Details */}
+      <View style={styles.detailsContainer}>
+        {/* Title (Bold) */}
+        <Text style={styles.title} numberOfLines={1}>
+          {title}
+        </Text>
+
+        {/* Sub-row: Time & Date | Divider | Category */}
+        <View style={styles.metaRow}>
+          <Text style={styles.timeDateText}>
+            {formattedTimeDate}
+          </Text>
+
+          <View style={styles.metaDivider} />
+
+          <Text style={styles.categoryText} numberOfLines={1}>
+            {category}
+          </Text>
+        </View>
+      </View>
+
+      {/* 3. Amount on Right: Income dark, Expenses blue with minus */}
+      <View style={styles.amountContainer}>
+        <Text
+          style={[
+            styles.amountText,
+            isIncome ? styles.incomeText : styles.expenseText,
+          ]}
+        >
+          {formatCurrency(numAmount, { showExplicitPlus: true })}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: borderRadius.md,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(5, 34, 36, 0.04)',
+    shadowColor: '#052224',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 6,
+    elevation: 1.5,
+  },
+  iconTile: {
+    width: 46,
+    height: 46,
+    borderRadius: borderRadius.iconTile, // Rounded-square tile
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  detailsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  title: {
+    fontFamily: typography.bold,
+    fontWeight: '700',
+    fontSize: 15,
+    color: colors.darkText,
+    marginBottom: 4,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  timeDateText: {
+    fontFamily: typography.semiBold,
+    fontWeight: '700',
+    fontSize: 11.5,
+    color: colors.blueAmount, // Small blue bold text
+  },
+  metaDivider: {
+    width: 1,
+    height: 11,
+    backgroundColor: 'rgba(5, 34, 36, 0.25)',
+    marginHorizontal: 8,
+  },
+  categoryText: {
+    fontFamily: typography.medium,
+    fontWeight: '500',
+    fontSize: 12,
+    color: colors.textMuted,
+  },
+  amountContainer: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  amountText: {
+    fontFamily: typography.bold,
+    fontWeight: '800',
+    fontSize: 15.5,
+  },
+  incomeText: {
+    color: colors.darkText, // Income dark
+  },
+  expenseText: {
+    color: colors.blueAmount, // Expenses blue with minus
+  },
+});
+
+export default TransactionItem;
