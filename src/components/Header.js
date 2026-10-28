@@ -1,7 +1,11 @@
 /**
  * Header.js
- * Signature Green Top Header with dynamic time-of-day greeting, drawer hamburger,
- * notification bell in light circle, balance & expense stats, and budget progress bar.
+ * Signature Green Top Header for Saver:
+ * - Hamburger menu icon (opens Drawer)
+ * - "Hi, Welcome Back" (bold dark) + dynamic greeting by time of day + user's name
+ * - Notification bell in light circle
+ * - Total Balance & Total Expense stats in Indian Rupees (₹) with vertical divider
+ * - Dynamic Budget Progress Bar with dark % and white remaining goal (₹2,00,000.00)
  */
 
 import React from 'react';
@@ -16,8 +20,9 @@ import {
 } from 'react-native';
 import { colors, typography, borderRadius } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { getTimeOfDayGreeting, formatCurrency } from '../utils/formatters';
+import { getTimeOfDayGreeting, formatINR } from '../utils/formatters';
 import { BudgetProgressBar } from './ProgressBar';
+import { useAuth } from '../context/AuthContext';
 
 export const Header = ({
   navigation,
@@ -27,12 +32,14 @@ export const Header = ({
   balance = 0,
   expense = 0,
   budgetPercent = 30,
-  budgetGoal = 20000.0,
+  budgetGoal = 200000.0,
   showBack = false,
   showNotification = true,
   onNotificationPress,
 }) => {
   const dynamicGreeting = getTimeOfDayGreeting();
+  const { currentUser } = useAuth();
+  const userName = currentUser?.name ? currentUser.name.split(' ')[0] : 'Priya';
 
   const handleMenuPress = () => {
     if (navigation && navigation.openDrawer) {
@@ -75,11 +82,13 @@ export const Header = ({
               {showFullStats ? (
                 <>
                   <Text style={styles.welcomeBackText}>Hi, Welcome Back</Text>
-                  <Text style={styles.greetingText}>{dynamicGreeting}</Text>
+                  <Text style={styles.greetingText}>
+                    {dynamicGreeting}, {userName}
+                  </Text>
                 </>
               ) : (
                 <>
-                  <Text style={styles.screenTitle}>{title || 'Finance Tracker'}</Text>
+                  <Text style={styles.screenTitle}>{title || 'Saver'}</Text>
                   {subtitle ? <Text style={styles.greetingText}>{subtitle}</Text> : null}
                 </>
               )}
@@ -99,27 +108,23 @@ export const Header = ({
           )}
         </View>
 
-        {/* 2. Full Stats (Home screen layout) */}
+        {/* 2. Full Stats (Dashboard layout) */}
         {showFullStats && (
           <View style={styles.statsSection}>
-            {/* Stats Row: Total Balance and Total Expense with vertical divider */}
             <View style={styles.statsRow}>
-              {/* Total Balance */}
               <View style={styles.statBox}>
                 <Text style={styles.statLabelWhite}>Total Balance</Text>
                 <Text style={styles.balanceAmountWhite}>
-                  {formatCurrency(balance)}
+                  {formatINR(balance)}
                 </Text>
               </View>
 
-              {/* Vertical Divider */}
               <View style={styles.verticalDivider} />
 
-              {/* Total Expense */}
               <View style={[styles.statBox, styles.statBoxRight]}>
                 <Text style={styles.statLabelWhite}>Total Expense</Text>
                 <Text style={styles.expenseAmountBlue}>
-                  {formatCurrency(-Math.abs(expense))}
+                  {formatINR(-Math.abs(expense))}
                 </Text>
               </View>
             </View>
@@ -135,13 +140,13 @@ export const Header = ({
 
 const styles = StyleSheet.create({
   headerContainer: {
-    backgroundColor: colors.primary, // #00D09E
+    backgroundColor: colors.primary,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 20 : 0,
     borderBottomLeftRadius: 36,
     borderBottomRightRadius: 36,
   },
   fullHeader: {
-    paddingBottom: 40, // allows mint sheet to overlap
+    paddingBottom: 40,
   },
   compactHeader: {
     paddingBottom: 36,
@@ -177,13 +182,13 @@ const styles = StyleSheet.create({
     fontFamily: typography.bold,
     fontWeight: '800',
     fontSize: 20,
-    color: colors.darkText, // Bold, dark text
+    color: colors.darkText,
     letterSpacing: -0.3,
   },
   greetingText: {
     fontFamily: typography.medium,
     fontSize: 12.5,
-    color: 'rgba(5, 34, 36, 0.8)',
+    color: 'rgba(5, 34, 36, 0.85)',
     marginTop: 1,
   },
   screenTitle: {
@@ -196,7 +201,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: borderRadius.pill,
-    backgroundColor: 'rgba(255, 255, 255, 0.45)', // Light circle
+    backgroundColor: 'rgba(255, 255, 255, 0.45)',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -237,13 +242,13 @@ const styles = StyleSheet.create({
     fontFamily: typography.bold,
     fontWeight: '800',
     fontSize: 22,
-    color: colors.white, // White, bold
+    color: colors.white,
   },
   expenseAmountBlue: {
     fontFamily: typography.bold,
     fontWeight: '800',
     fontSize: 22,
-    color: colors.blueAmount, // Blue, negative number
+    color: colors.blueAmount,
   },
   verticalDivider: {
     width: 1.5,

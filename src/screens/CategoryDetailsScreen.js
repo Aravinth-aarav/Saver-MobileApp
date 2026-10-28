@@ -1,26 +1,26 @@
 /**
  * CategoryDetailsScreen.js
- * Detailed category view with total spent, budget left,
- * progress threshold warning, mini chart, and transaction list for that category.
+ * Detailed category view in Indian Rupees (₹):
+ * Total spent, budget left, progress warning (>80% / 100%),
+ * consumption gauge chart, and category-filtered transaction list.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { colors, borderRadius, typography, shadows } from '../constants/theme';
+import { colors, borderRadius, typography } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
 import { Card } from '../components/Card';
 import { TransactionItem } from '../components/TransactionItem';
 import { CategoryProgressBar } from '../components/ProgressBar';
 import { useFinance } from '../context/FinanceContext';
-import { formatCurrency } from '../utils/formatters';
+import { formatINR } from '../utils/formatters';
 import { ProgressChart } from 'react-native-chart-kit';
 
 const screenWidth = Dimensions.get('window').width;
@@ -33,11 +33,10 @@ export const CategoryDetailsScreen = ({ route, navigation }) => {
     id: 'unknown',
     name: categoryName || 'Category',
     displayName: displayName || categoryName || 'Category',
-    budget: 500,
+    budget: 5000,
     color: colors.primary,
   };
 
-  // Filter transactions
   const categoryTransactions = transactions.filter(
     (tx) =>
       tx.category === currentCategory.name ||
@@ -52,7 +51,7 @@ export const CategoryDetailsScreen = ({ route, navigation }) => {
     }
   });
 
-  const budget = currentCategory.budget || 500;
+  const budget = currentCategory.budget || 5000;
   const budgetLeft = Math.max(0, budget - totalSpent);
   const percentUsed = budget > 0 ? (totalSpent / budget) * 100 : 0;
   const isOverBudget = percentUsed >= 100;
@@ -67,7 +66,7 @@ export const CategoryDetailsScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <Header
         title={currentCategory.displayName || currentCategory.name}
-        subtitle="Category Budget & Activity"
+        subtitle="Category Budget & Activity in ₹"
         showBack={true}
         navigation={navigation}
         showNotification={false}
@@ -83,7 +82,7 @@ export const CategoryDetailsScreen = ({ route, navigation }) => {
             <View style={styles.alertBannerDanger}>
               <Ionicons name="alert-circle" size={20} color={colors.danger} />
               <Text style={styles.alertBannerTextDanger}>
-                Budget Exceeded! You have spent ${totalSpent.toFixed(2)} of your ${budget} limit.
+                Budget Exceeded! You have spent {formatINR(totalSpent)} of your {formatINR(budget)} limit.
               </Text>
             </View>
           )}
@@ -92,17 +91,17 @@ export const CategoryDetailsScreen = ({ route, navigation }) => {
             <View style={styles.alertBannerWarning}>
               <Ionicons name="warning" size={20} color={colors.warning} />
               <Text style={styles.alertBannerTextWarning}>
-                Budget Warning! You have consumed {percentUsed.toFixed(0)}% of your budget limit.
+                Budget Warning! You have consumed {percentUsed.toFixed(0)}% of your category limit.
               </Text>
             </View>
           )}
 
-          {/* Stats Card: Total Spent & Budget Left */}
+          {/* Stats Card: Total Spent & Budget Left in ₹ */}
           <Card style={styles.statsCard}>
             <View style={styles.statsTopRow}>
               <View>
                 <Text style={styles.statLabel}>Total Spent</Text>
-                <Text style={styles.statSpentValue}>{formatCurrency(totalSpent)}</Text>
+                <Text style={styles.statSpentValue}>{formatINR(totalSpent)}</Text>
               </View>
 
               <View style={styles.statDivider} />
@@ -110,15 +109,14 @@ export const CategoryDetailsScreen = ({ route, navigation }) => {
               <View style={{ alignItems: 'flex-end' }}>
                 <Text style={styles.statLabel}>Budget Left</Text>
                 <Text style={[styles.statLeftValue, isOverBudget && { color: colors.danger }]}>
-                  {formatCurrency(budgetLeft)}
+                  {formatINR(budgetLeft)}
                 </Text>
               </View>
             </View>
 
-            {/* Visual Progress Bar */}
             <View style={styles.progressContainer}>
               <View style={styles.progressMeta}>
-                <Text style={styles.progressMetaLabel}>Allocated: {formatCurrency(budget)}</Text>
+                <Text style={styles.progressMetaLabel}>Allocated: {formatINR(budget)}</Text>
                 <Text style={styles.progressMetaPercent}>{percentUsed.toFixed(0)}% Used</Text>
               </View>
               <CategoryProgressBar percent={percentUsed} height={10} />
@@ -168,7 +166,7 @@ export const CategoryDetailsScreen = ({ route, navigation }) => {
               <TransactionItem
                 key={tx.id}
                 transaction={tx}
-                onPress={() => navigation.navigate('Transactions')}
+                onPress={() => navigation.navigate('TransactionsTab')}
               />
             ))
           )}

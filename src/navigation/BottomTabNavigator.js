@@ -1,10 +1,10 @@
 /**
  * BottomTabNavigator.js
- * Custom styled fintech bottom tab navigation:
+ * Custom styled bottom tab navigation for Saver:
  * - Rounded light-green container (#DFF7E2)
  * - Active tab gets a green rounded-square background (#00D09E)
- * - Customer sees all 5 tabs (Home, Analysis, Transactions, Categories, Profile)
- * - Admin sees only 2 tabs (Home, Analysis)
+ * - Customer sees all 5 tabs: Dashboard, Analysis, Transactions, Categories, Profile
+ * - Admin sees only 2 tabs: Dashboard, Analysis
  */
 
 import React from 'react';
@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
 // Screens
-import HomeScreen from '../screens/HomeScreen';
+import DashboardScreen from '../screens/DashboardScreen';
 import AnalysisScreen from '../screens/AnalysisScreen';
 import TransactionsScreen from '../screens/TransactionsScreen';
 import CategoriesScreen from '../screens/CategoriesScreen';
@@ -23,7 +23,6 @@ import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
-// Custom Floating Tab Bar
 function CustomTabBar({ state, descriptors, navigation }) {
   return (
     <View style={styles.tabBarWrapper}>
@@ -44,9 +43,8 @@ function CustomTabBar({ state, descriptors, navigation }) {
             }
           };
 
-          // Icon resolver
           let iconName = 'home';
-          if (route.name === 'HomeTab') {
+          if (route.name === 'DashboardTab') {
             iconName = isFocused ? 'home' : 'home-outline';
           } else if (route.name === 'AnalysisTab') {
             iconName = isFocused ? 'stats-chart' : 'analytics-outline';
@@ -101,10 +99,10 @@ export const BottomTabNavigator = () => {
         headerShown: false,
       }}
     >
-      {/* 1. Home Tab (Both Admin & Customer) */}
-      <Tab.Screen name="HomeTab" component={HomeScreen} />
+      {/* 1. Dashboard Tab (Admin + Customer) */}
+      <Tab.Screen name="DashboardTab" component={DashboardScreen} />
 
-      {/* 2. Analysis Tab (Both Admin & Customer) */}
+      {/* 2. Analysis Tab (Admin + Customer) */}
       <Tab.Screen name="AnalysisTab" component={AnalysisScreen} />
 
       {/* Tabs 3, 4, 5: Customer Only */}
@@ -129,8 +127,8 @@ const styles = StyleSheet.create({
   },
   tabBarContainer: {
     flexDirection: 'row',
-    backgroundColor: colors.lightGreen, // #DFF7E2 light green container
-    borderRadius: borderRadius.pill,    // Rounded container
+    backgroundColor: colors.lightGreen,
+    borderRadius: borderRadius.pill,
     paddingVertical: 6,
     paddingHorizontal: 8,
     alignItems: 'center',
@@ -148,13 +146,13 @@ const styles = StyleSheet.create({
   iconTile: {
     width: 44,
     height: 44,
-    borderRadius: borderRadius.iconTile, // Rounded-square tile
+    borderRadius: borderRadius.iconTile,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
   activeIconTile: {
-    backgroundColor: colors.primary, // Green rounded-square active background (#00D09E)
+    backgroundColor: colors.primary,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.35,

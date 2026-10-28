@@ -1,7 +1,7 @@
 /**
- * SignInScreen.js
- * Sign In screen with role selector (Customer vs Admin),
- * 1-tap Demo Login autofill buttons, and inline red error validation.
+ * LoginScreen.js
+ * Login screen for Saver with role selector (Customer vs Admin),
+ * 1-tap demo credentials autofill, and inline red error validation.
  */
 
 import React, { useState } from 'react';
@@ -14,7 +14,7 @@ import {
   Platform,
   TouchableOpacity,
 } from 'react-native';
-import { colors, borderRadius, typography, shadows } from '../constants/theme';
+import { colors, borderRadius, typography } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
 import InputField from '../components/InputField';
@@ -22,7 +22,7 @@ import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import { validateEmail, validatePassword } from '../utils/validators';
 
-export const SignInScreen = ({ navigation }) => {
+export const LoginScreen = ({ navigation }) => {
   const { login } = useAuth();
   const [role, setRole] = useState('customer'); // 'customer' | 'admin'
   const [email, setEmail] = useState('');
@@ -31,7 +31,6 @@ export const SignInScreen = ({ navigation }) => {
   const [authError, setAuthError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Quick autofill buttons for evaluation
   const fillDemo = (userRole) => {
     setRole(userRole);
     setErrors({});
@@ -45,7 +44,7 @@ export const SignInScreen = ({ navigation }) => {
     }
   };
 
-  const handleSignIn = async () => {
+  const handleLogin = async () => {
     setAuthError('');
     const errs = {};
 
@@ -69,10 +68,9 @@ export const SignInScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* 1. Green Header */}
       <Header
-        title="Sign In"
-        subtitle="Access your personal finance dashboard"
+        title="Login to Saver"
+        subtitle="Manage your personal budget"
         showBack={true}
         navigation={navigation}
         showNotification={false}
@@ -82,14 +80,13 @@ export const SignInScreen = ({ navigation }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardView}
       >
-        {/* 2. Mint Rounded Sheet overlapping from below */}
         <View style={styles.mintSheet}>
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.sheetScroll}
           >
-            {/* Role Selector Pill */}
-            <Text style={styles.sectionLabel}>Select Your Role</Text>
+            {/* Role Selector */}
+            <Text style={styles.sectionLabel}>Select Your Account Role</Text>
             <View style={styles.roleContainer}>
               <TouchableOpacity
                 activeOpacity={0.8}
@@ -146,7 +143,7 @@ export const SignInScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            {/* Quick Demo Fill Buttons for Fast Grading */}
+            {/* Quick Demo Autofill Chips */}
             <View style={styles.quickFillRow}>
               <Text style={styles.quickFillLabel}>1-Tap Fill:</Text>
               <TouchableOpacity
@@ -165,7 +162,7 @@ export const SignInScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            {/* Global Auth Error Alert */}
+            {/* Auth Error Banner */}
             {authError ? (
               <View style={styles.authErrorBox}>
                 <Ionicons name="alert-circle" size={18} color={colors.danger} />
@@ -175,7 +172,7 @@ export const SignInScreen = ({ navigation }) => {
 
             {/* Input Fields */}
             <InputField
-              label="Email Address"
+              label="Email Address *"
               value={email}
               onChangeText={(text) => {
                 setEmail(text);
@@ -189,7 +186,7 @@ export const SignInScreen = ({ navigation }) => {
             />
 
             <InputField
-              label="Password"
+              label="Password *"
               value={password}
               onChangeText={(text) => {
                 setPassword(text);
@@ -201,19 +198,19 @@ export const SignInScreen = ({ navigation }) => {
               error={errors.password}
             />
 
-            {/* Sign In Button */}
+            {/* Login Button */}
             <Button
-              title="Sign In"
-              onPress={handleSignIn}
+              title="Login"
+              onPress={handleLogin}
               loading={loading}
               variant="primary"
               size="lg"
               style={{ marginTop: 10 }}
             />
 
-            {/* Sign Up Navigation Link */}
+            {/* Link to Sign Up */}
             <View style={styles.signupPromptRow}>
-              <Text style={styles.promptText}>Don't have an account? </Text>
+              <Text style={styles.promptText}>New to Saver? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
                 <Text style={styles.signupLinkText}>Sign Up</Text>
               </TouchableOpacity>
@@ -228,15 +225,15 @@ export const SignInScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary, // Green header background
+    backgroundColor: colors.primary,
   },
   keyboardView: {
     flex: 1,
   },
   mintSheet: {
     flex: 1,
-    backgroundColor: colors.background, // Mint rounded sheet
-    borderTopLeftRadius: borderRadius.sheet, // ~50px top corners
+    backgroundColor: colors.background,
+    borderTopLeftRadius: borderRadius.sheet,
     borderTopRightRadius: borderRadius.sheet,
     marginTop: -16,
     overflow: 'hidden',
@@ -344,4 +341,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignInScreen;
+export default LoginScreen;

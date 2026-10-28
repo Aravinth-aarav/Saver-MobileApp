@@ -1,8 +1,8 @@
 /**
  * TransactionsScreen.js
- * Customer screen for Month-wise transactions management:
- * - Month selector
- * - Monthly totals summary
+ * Month-wise transactions management in Indian Rupees (₹):
+ * - Month selector (prev/next)
+ * - Monthly total banner in ₹
  * - Date-grouped transaction list
  * - Add / Edit / Delete modal with inline red error validation
  * - Personalized alert feedback on every mutation
@@ -25,7 +25,7 @@ import { TransactionItem } from '../components/TransactionItem';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 import { useFinance } from '../context/FinanceContext';
-import { formatCurrency } from '../utils/formatters';
+import { formatINR } from '../utils/formatters';
 import { validateAmount, validateRequired } from '../utils/validators';
 
 export const TransactionsScreen = ({ navigation }) => {
@@ -39,20 +39,19 @@ export const TransactionsScreen = ({ navigation }) => {
 
   // Month navigation: 0 = current month, -1 = last month, etc.
   const [monthOffset, setMonthOffset] = useState(0);
-  const [filterType, setFilterType] = useState('all'); // 'all' | 'expense' | 'income'
+  const [filterType, setFilterType] = useState('all');
 
   // Modal State for Add / Edit
   const [modalVisible, setModalVisible] = useState(false);
-  const [editingTx, setEditingTx] = useState(null); // null if adding new
+  const [editingTx, setEditingTx] = useState(null);
   const [formTitle, setFormTitle] = useState('');
   const [formAmount, setFormAmount] = useState('');
-  const [formType, setFormType] = useState('expense'); // 'expense' | 'income'
+  const [formType, setFormType] = useState('expense');
   const [formCategory, setFormCategory] = useState('Food');
   const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
   const [formNotes, setFormNotes] = useState('');
   const [formErrors, setFormErrors] = useState({});
 
-  // Compute selected month & year
   const currentDate = new Date();
   const targetDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + monthOffset, 1);
   const monthNames = [
@@ -61,7 +60,6 @@ export const TransactionsScreen = ({ navigation }) => {
   ];
   const displayMonthString = `${monthNames[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
 
-  // Filter transactions for target month
   const targetMonth = targetDate.getMonth();
   const targetYear = targetDate.getFullYear();
 
@@ -73,7 +71,6 @@ export const TransactionsScreen = ({ navigation }) => {
     return tx.type === filterType;
   });
 
-  // Calculate monthly stats for the target month
   let monthlyIncome = 0;
   let monthlyExpense = 0;
   transactions.forEach((tx) => {
@@ -88,7 +85,6 @@ export const TransactionsScreen = ({ navigation }) => {
   });
   const monthlyNet = monthlyIncome - monthlyExpense;
 
-  // Group transactions by date
   const groupedTransactions = {};
   monthFilteredTx.forEach((tx) => {
     const txDate = new Date(tx.date);
@@ -99,7 +95,6 @@ export const TransactionsScreen = ({ navigation }) => {
     groupedTransactions[dateKey].push(tx);
   });
 
-  // Open modal for Adding
   const openAddModal = () => {
     setEditingTx(null);
     setFormTitle('');
@@ -112,7 +107,6 @@ export const TransactionsScreen = ({ navigation }) => {
     setModalVisible(true);
   };
 
-  // Open modal for Editing
   const openEditModal = (tx) => {
     setEditingTx(tx);
     setFormTitle(tx.title);
@@ -125,7 +119,6 @@ export const TransactionsScreen = ({ navigation }) => {
     setModalVisible(true);
   };
 
-  // Handle Save (Add or Update) with inline validation
   const handleSaveTransaction = async () => {
     const errs = {};
 
@@ -145,7 +138,6 @@ export const TransactionsScreen = ({ navigation }) => {
     if (Object.keys(errs).length > 0) return;
 
     if (editingTx) {
-      // Update
       await updateTransaction({
         ...editingTx,
         title: formTitle,
@@ -157,7 +149,6 @@ export const TransactionsScreen = ({ navigation }) => {
         notes: formNotes,
       });
     } else {
-      // Add
       await addTransaction({
         title: formTitle,
         amount: Number(formAmount),
@@ -172,7 +163,6 @@ export const TransactionsScreen = ({ navigation }) => {
     setModalVisible(false);
   };
 
-  // Handle Delete with confirmation
   const handleDeleteTransaction = (id) => {
     Alert.alert(
       'Delete Transaction',
@@ -195,7 +185,7 @@ export const TransactionsScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Header
         title="Transactions"
-        subtitle="Manage and track month-wise activity"
+        subtitle="Manage activity in Indian Rupees (₹)"
         showBack={false}
         navigation={navigation}
         showNotification={true}
@@ -228,29 +218,29 @@ export const TransactionsScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Monthly Totals Summary Banner */}
+          {/* Monthly Totals Summary Banner in ₹ */}
           <View style={[styles.summaryCard, shadows.card]}>
             <View style={styles.summaryCol}>
               <Text style={styles.summaryLabel}>Monthly Income</Text>
-              <Text style={styles.incomeValue}>{formatCurrency(monthlyIncome)}</Text>
+              <Text style={styles.incomeValue}>{formatINR(monthlyIncome)}</Text>
             </View>
 
             <View style={styles.summaryDivider} />
 
             <View style={styles.summaryCol}>
               <Text style={styles.summaryLabel}>Monthly Expenses</Text>
-              <Text style={styles.expenseValue}>{formatCurrency(-monthlyExpense)}</Text>
+              <Text style={styles.expenseValue}>{formatINR(-monthlyExpense)}</Text>
             </View>
 
             <View style={styles.summaryDivider} />
 
             <View style={styles.summaryCol}>
               <Text style={styles.summaryLabel}>Net Remaining</Text>
-              <Text style={styles.netValue}>{formatCurrency(monthlyNet)}</Text>
+              <Text style={styles.netValue}>{formatINR(monthlyNet)}</Text>
             </View>
           </View>
 
-          {/* Filter Pills: All | Expense | Income */}
+          {/* Filter Pills */}
           <View style={styles.filterRow}>
             <TouchableOpacity
               onPress={() => setFilterType('all')}
@@ -286,7 +276,7 @@ export const TransactionsScreen = ({ navigation }) => {
               <Ionicons name="receipt-outline" size={48} color={colors.textLight} />
               <Text style={styles.emptyTitle}>No Transactions for {displayMonthString}</Text>
               <Text style={styles.emptySubtitle}>
-                Tap the "+ Add Transaction" button below to log income or expenses.
+                Tap "+ Add Transaction" below to log expenses or income in ₹.
               </Text>
             </View>
           ) : (
@@ -310,7 +300,6 @@ export const TransactionsScreen = ({ navigation }) => {
             ))
           )}
 
-          {/* Space for Floating Button & Tab Bar */}
           <View style={{ height: 100 }} />
         </ScrollView>
 
@@ -347,7 +336,7 @@ export const TransactionsScreen = ({ navigation }) => {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 500 }}>
-              {/* Type Switcher: Expense vs Income */}
+              {/* Type Switcher */}
               <View style={styles.typeSwitcherRow}>
                 <TouchableOpacity
                   onPress={() => setFormType('expense')}
@@ -392,26 +381,26 @@ export const TransactionsScreen = ({ navigation }) => {
                   setFormTitle(text);
                   if (formErrors.title) setFormErrors((p) => ({ ...p, title: null }));
                 }}
-                placeholder="e.g. Grocery Pantry, Salary, Uber"
+                placeholder="e.g. Groceries, Rent, Salary"
                 icon="pricetag-outline"
                 error={formErrors.title}
               />
 
-              {/* Amount */}
+              {/* Amount in ₹ */}
               <InputField
-                label="Amount ($) *"
+                label="Amount (₹) *"
                 value={formAmount}
                 onChangeText={(text) => {
                   setFormAmount(text);
                   if (formErrors.amount) setFormErrors((p) => ({ ...p, amount: null }));
                 }}
-                placeholder="e.g. 50.00"
+                placeholder="e.g. 1000.00"
                 keyboardType="decimal-pad"
                 icon="cash-outline"
                 error={formErrors.amount}
               />
 
-              {/* Category Selector Chips */}
+              {/* Category Selector */}
               <Text style={styles.inputSectionLabel}>Select Category *</Text>
               <View style={styles.categoryChipsGrid}>
                 {categories.map((c) => {
@@ -459,11 +448,11 @@ export const TransactionsScreen = ({ navigation }) => {
                 label="Notes (Optional)"
                 value={formNotes}
                 onChangeText={setFormNotes}
-                placeholder="Optional details or memo"
+                placeholder="Optional memo or description"
                 icon="document-text-outline"
               />
 
-              {/* Action Buttons */}
+              {/* Save Button */}
               <Button
                 title={editingTx ? 'Save Changes' : 'Add Transaction'}
                 onPress={handleSaveTransaction}

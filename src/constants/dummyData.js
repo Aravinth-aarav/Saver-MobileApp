@@ -1,7 +1,7 @@
 /**
  * dummyData.js
- * Initial seed data for Finance Budget Tracker
- * Context API + AsyncStorage will hydrate from this on first run
+ * Seeded financial dummy data with realistic Indian Rupee (₹) amounts:
+ * Salary ₹40,000, Groceries ₹1,000, Rent ₹6,740, total balance ₹77,830, goal ₹2,00,000.
  */
 
 export const INITIAL_CATEGORIES = [
@@ -10,7 +10,7 @@ export const INITIAL_CATEGORIES = [
     name: 'Food',
     displayName: 'Food & Dining',
     icon: 'restaurant',
-    budget: 800,
+    budget: 8000,
     color: '#3299FF',
   },
   {
@@ -18,7 +18,7 @@ export const INITIAL_CATEGORIES = [
     name: 'Transport',
     displayName: 'Transportation',
     icon: 'car',
-    budget: 400,
+    budget: 4000,
     color: '#6DB6FE',
   },
   {
@@ -26,7 +26,7 @@ export const INITIAL_CATEGORIES = [
     name: 'Shopping',
     displayName: 'Shopping',
     icon: 'cart',
-    budget: 600,
+    budget: 6000,
     color: '#0068FF',
   },
   {
@@ -34,7 +34,7 @@ export const INITIAL_CATEGORIES = [
     name: 'Bills',
     displayName: 'Bills & Utilities',
     icon: 'receipt',
-    budget: 700,
+    budget: 10000,
     color: '#3299FF',
   },
   {
@@ -42,7 +42,7 @@ export const INITIAL_CATEGORIES = [
     name: 'Health',
     displayName: 'Health & Medical',
     icon: 'medkit',
-    budget: 450,
+    budget: 4500,
     color: '#6DB6FE',
   },
   {
@@ -50,28 +50,23 @@ export const INITIAL_CATEGORIES = [
     name: 'Entertainment',
     displayName: 'Entertainment',
     icon: 'film',
-    budget: 350,
+    budget: 3500,
     color: '#0068FF',
   },
 ];
 
 const now = new Date();
 const todayISO = now.toISOString();
-
-// 2 days ago
 const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString();
-// 4 days ago
 const fourDaysAgo = new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000).toISOString();
-// 8 days ago
 const eightDaysAgo = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000).toISOString();
-// 12 days ago
 const twelveDaysAgo = new Date(now.getTime() - 12 * 24 * 60 * 60 * 1000).toISOString();
 
 export const INITIAL_TRANSACTIONS = [
   {
     id: 'tx-1',
     title: 'Salary Deposit',
-    amount: 5000.00,
+    amount: 40000.00,
     type: 'income',
     category: 'Monthly',
     categoryGroup: 'Bills',
@@ -83,8 +78,8 @@ export const INITIAL_TRANSACTIONS = [
   },
   {
     id: 'tx-2',
-    title: 'Grocery Pantry',
-    amount: -142.50,
+    title: 'Groceries & Pantry',
+    amount: -1000.00,
     type: 'expense',
     category: 'Pantry',
     categoryGroup: 'Food',
@@ -92,12 +87,12 @@ export const INITIAL_TRANSACTIONS = [
     time: '18:27',
     icon: 'cart-outline',
     tileColor: '#3299FF',
-    notes: 'Organic vegetables, milk, pantry staples',
+    notes: 'Organic vegetables, dairy, pantry staples',
   },
   {
     id: 'tx-3',
-    title: 'Apartment Rent',
-    amount: -1200.00,
+    title: 'House Rent',
+    amount: -6740.00,
     type: 'expense',
     category: 'Rent',
     categoryGroup: 'Bills',
@@ -105,12 +100,12 @@ export const INITIAL_TRANSACTIONS = [
     time: '11:00',
     icon: 'home-outline',
     tileColor: '#6DB6FE',
-    notes: 'May apartment rental payment',
+    notes: 'Monthly apartment rental transfer',
   },
   {
     id: 'tx-4',
-    title: 'Uber City Commute',
-    amount: -28.50,
+    title: 'City Metro & Uber',
+    amount: -450.00,
     type: 'expense',
     category: 'Transport',
     categoryGroup: 'Transport',
@@ -118,12 +113,12 @@ export const INITIAL_TRANSACTIONS = [
     time: '08:45',
     icon: 'car-outline',
     tileColor: '#0068FF',
-    notes: 'Morning ride to university campus',
+    notes: 'Campus travel & commute passes',
   },
   {
     id: 'tx-5',
     title: 'Freelance Design Gig',
-    amount: 850.00,
+    amount: 50000.00,
     type: 'income',
     category: 'Freelance',
     categoryGroup: 'Shopping',
@@ -131,12 +126,12 @@ export const INITIAL_TRANSACTIONS = [
     time: '16:20',
     icon: 'laptop-outline',
     tileColor: '#3299FF',
-    notes: 'Brand identity design project milestone 1',
+    notes: 'Fintech mobile UI design milestone',
   },
   {
     id: 'tx-6',
-    title: 'Starbucks Coffee & Cafe',
-    amount: -16.80,
+    title: 'Cafe & Snacks',
+    amount: -450.00,
     type: 'expense',
     category: 'Food',
     categoryGroup: 'Food',
@@ -144,12 +139,12 @@ export const INITIAL_TRANSACTIONS = [
     time: '15:10',
     icon: 'cafe-outline',
     tileColor: '#6DB6FE',
-    notes: 'Caramel macchiato with study group',
+    notes: 'Evening tea & snacks with study group',
   },
   {
     id: 'tx-7',
     title: 'Electricity & High-speed Wifi',
-    amount: -115.00,
+    amount: -1200.00,
     type: 'expense',
     category: 'Bills',
     categoryGroup: 'Bills',
@@ -157,12 +152,12 @@ export const INITIAL_TRANSACTIONS = [
     time: '10:30',
     icon: 'flash-outline',
     tileColor: '#0068FF',
-    notes: 'Utility bill payment',
+    notes: 'Monthly utility bill clearance',
   },
   {
     id: 'tx-8',
     title: 'Pharmacy & Health Vitamins',
-    amount: -65.20,
+    amount: -850.00,
     type: 'expense',
     category: 'Health',
     categoryGroup: 'Health',
@@ -170,12 +165,12 @@ export const INITIAL_TRANSACTIONS = [
     time: '14:05',
     icon: 'medkit-outline',
     tileColor: '#3299FF',
-    notes: 'Daily multivitamins & supplements',
+    notes: 'Monthly supplements and wellness pack',
   },
   {
     id: 'tx-9',
-    title: 'Movie Night & Popcorn',
-    amount: -45.00,
+    title: 'Weekend Movie & Dinner',
+    amount: -980.00,
     type: 'expense',
     category: 'Entertainment',
     categoryGroup: 'Entertainment',
@@ -183,12 +178,12 @@ export const INITIAL_TRANSACTIONS = [
     time: '20:15',
     icon: 'film-outline',
     tileColor: '#6DB6FE',
-    notes: 'IMAX weekend movie with friends',
+    notes: 'Cinema tickets and weekend food',
   },
   {
     id: 'tx-10',
-    title: 'Sneakers & Sportswear',
-    amount: -130.00,
+    title: 'Shopping & Apparel',
+    amount: -2500.00,
     type: 'expense',
     category: 'Shopping',
     categoryGroup: 'Shopping',
@@ -196,18 +191,57 @@ export const INITIAL_TRANSACTIONS = [
     time: '17:40',
     icon: 'shirt-outline',
     tileColor: '#0068FF',
-    notes: 'Running shoes on seasonal clearance',
+    notes: 'Seasonal festival clothes shopping',
+  },
+  {
+    id: 'tx-11',
+    title: 'Gym & Fitness Membership',
+    amount: -1500.00,
+    type: 'expense',
+    category: 'Health',
+    categoryGroup: 'Health',
+    date: twelveDaysAgo,
+    time: '07:30',
+    icon: 'barbell-outline',
+    tileColor: '#3299FF',
+    notes: 'Monthly fitness center subscription',
+  },
+  {
+    id: 'tx-12',
+    title: 'Books & Course Certifications',
+    amount: -1500.00,
+    type: 'expense',
+    category: 'Bills',
+    categoryGroup: 'Bills',
+    date: twelveDaysAgo,
+    time: '12:15',
+    icon: 'book-outline',
+    tileColor: '#6DB6FE',
+    notes: 'Technical react native handbook',
+  },
+  {
+    id: 'tx-13',
+    title: 'Investment Dividend',
+    amount: 5000.00,
+    type: 'income',
+    category: 'Dividend',
+    categoryGroup: 'Bills',
+    date: twelveDaysAgo,
+    time: '11:45',
+    icon: 'trending-up-outline',
+    tileColor: '#00D09E',
+    notes: 'Quarterly mutual fund return payout',
   },
 ];
 
 export const INITIAL_SAVINGS_GOAL = {
   title: 'Savings On Goals',
   target: 'Electric Car Fund',
-  goalAmount: 20000.00,
-  savedAmount: 14200.00, // 71%
+  goalAmount: 200000.00,
+  savedAmount: 142000.00,
   percentage: 71,
-  revenueLastWeek: 4200.00,
-  foodLastWeek: -180.00,
+  revenueLastWeek: 42000.00,
+  foodLastWeek: -1800.00,
 };
 
 export const DEMO_USERS = [
@@ -218,8 +252,7 @@ export const DEMO_USERS = [
     name: 'Admin Supervisor',
     phone: '9876543210',
     role: 'admin',
-    monthlyBudget: 25000.00,
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=faces',
+    monthlyBudget: 200000.00,
   },
   {
     id: 'usr-customer',
@@ -228,7 +261,6 @@ export const DEMO_USERS = [
     name: 'Priya Sharma',
     phone: '9876543210',
     role: 'customer',
-    monthlyBudget: 5000.00,
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=faces',
+    monthlyBudget: 35000.00,
   },
 ];

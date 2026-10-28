@@ -1,20 +1,19 @@
 /**
  * EditProfileScreen.js
- * Form allowing customer to update Name, Email, Phone, and Monthly Budget Goal
- * with inline red error validation and instant sync with Context & AsyncStorage.
+ * Form allowing customer to update Name, Email, 10-digit Phone,
+ * and Monthly Budget Goal in Rupees (₹) with red inline error validation.
  */
 
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Alert,
 } from 'react-native';
-import { colors, borderRadius, typography } from '../constants/theme';
+import { colors, borderRadius } from '../constants/theme';
 import { Header } from '../components/Header';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
@@ -34,7 +33,7 @@ export const EditProfileScreen = ({ navigation }) => {
   const [name, setName] = useState(currentUser?.name || '');
   const [email, setEmail] = useState(currentUser?.email || '');
   const [phone, setPhone] = useState(currentUser?.phone || '');
-  const [budget, setBudget] = useState(String(monthlyBudget || 5000));
+  const [budget, setBudget] = useState(String(monthlyBudget || 35000));
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -58,7 +57,6 @@ export const EditProfileScreen = ({ navigation }) => {
 
     setLoading(true);
 
-    // Update profile in AuthContext
     await updateProfile({
       name: name.trim(),
       email: email.trim(),
@@ -66,11 +64,10 @@ export const EditProfileScreen = ({ navigation }) => {
       monthlyBudget: Number(budget),
     });
 
-    // Update budget in FinanceContext
     await updateMonthlyBudget(Number(budget));
 
     setLoading(false);
-    Alert.alert('Success', 'Profile updated successfully!', [
+    Alert.alert('Success', 'Profile & budget updated successfully!', [
       { text: 'OK', onPress: () => navigation.goBack() },
     ]);
   };
@@ -79,7 +76,7 @@ export const EditProfileScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Header
         title="Edit Profile"
-        subtitle="Update your contact info and budget"
+        subtitle="Update contact info & budget in ₹"
         showBack={true}
         navigation={navigation}
         showNotification={false}
@@ -134,13 +131,13 @@ export const EditProfileScreen = ({ navigation }) => {
             />
 
             <InputField
-              label="Monthly Budget Limit ($) *"
+              label="Monthly Budget Limit (₹) *"
               value={budget}
               onChangeText={(text) => {
                 setBudget(text);
                 if (errors.budget) setErrors((prev) => ({ ...prev, budget: null }));
               }}
-              placeholder="e.g. 5000"
+              placeholder="e.g. 35000"
               icon="cash-outline"
               keyboardType="decimal-pad"
               error={errors.budget}

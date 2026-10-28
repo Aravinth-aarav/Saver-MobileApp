@@ -1,13 +1,13 @@
 /**
  * CategoryCard.js
- * Grid item displaying category icon tile, name, amount spent vs budget, and progress bar
+ * Grid item displaying category icon tile, name, amount spent vs budget in ₹, and progress bar
  */
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, borderRadius, typography, shadows } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { formatCurrency } from '../utils/formatters';
+import { formatINR } from '../utils/formatters';
 import { CategoryProgressBar } from './ProgressBar';
 
 export const CategoryCard = ({
@@ -17,10 +17,9 @@ export const CategoryCard = ({
   onPress,
   style,
 }) => {
-  const { displayName, name, icon, budget = 500, color = colors.iconTileBlueMedium } = category;
+  const { displayName, name, icon, budget = 5000, color = colors.iconTileBlueMedium } = category;
   const numSpent = Math.abs(spent);
   const percent = budget > 0 ? (numSpent / budget) * 100 : 0;
-  const remaining = Math.max(0, budget - numSpent);
 
   // Status tag
   let badgeText = 'Normal';
@@ -90,12 +89,12 @@ export const CategoryCard = ({
       <View style={styles.bottomRow}>
         <View>
           <Text style={styles.spentLabel}>Spent</Text>
-          <Text style={styles.spentValue}>{formatCurrency(numSpent)}</Text>
+          <Text style={styles.spentValue}>{formatINR(numSpent)}</Text>
         </View>
 
         <View style={styles.rightStat}>
           <Text style={styles.budgetLabel}>Budget</Text>
-          <Text style={styles.budgetValue}>{formatCurrency(budget)}</Text>
+          <Text style={styles.budgetValue}>{formatINR(budget)}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -105,7 +104,7 @@ export const CategoryCard = ({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
-    borderRadius: borderRadius.card, // ~25px rounded corners
+    borderRadius: borderRadius.card,
     padding: 16,
     marginBottom: 14,
     borderWidth: 1,
@@ -167,7 +166,7 @@ const styles = StyleSheet.create({
     fontFamily: typography.bold,
     fontWeight: '700',
     fontSize: 14,
-    color: colors.blueAmount, // Blue for expenses
+    color: colors.blueAmount,
   },
   rightStat: {
     alignItems: 'flex-end',

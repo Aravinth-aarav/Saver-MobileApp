@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Finance Budget Tracker",
-    "slug": "finance-budget-tracker",
+    "name": "Saver",
+    "slug": "saver",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

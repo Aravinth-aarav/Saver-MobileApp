@@ -1,8 +1,10 @@
 /**
  * DrawerNavigator.js
- * Drawer that wraps the BottomTabNavigator.
- * Items: Home, Profile (Customer), About, Logout.
- * Opens by swiping from the left edge and tapping the hamburger menu icon in the Header.
+ * Drawer wrapping the BottomTabNavigator for Saver:
+ * - Header shows user name, avatar, and role badge
+ * - Items: Dashboard, Profile (Customer), About Saver, Logout
+ * - Opens by swiping from left edge and tapping menu icon in Header
+ * - Logout resets state back to Home landing screen
  */
 
 import React from 'react';
@@ -21,28 +23,26 @@ import { colors, borderRadius, typography } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
-// Navigation Components & Screens
 import BottomTabNavigator from './BottomTabNavigator';
 import AboutScreen from '../screens/AboutScreen';
 
 const Drawer = createDrawerNavigator();
 
-// Custom Drawer Content
 function CustomDrawerContent(props) {
   const { currentUser, role, logout } = useAuth();
   const isAdmin = role === 'admin';
 
   return (
     <SafeAreaView style={styles.drawerSafeArea}>
-      {/* Drawer Header Banner */}
+      {/* Header with user info */}
       <View style={styles.drawerHeader}>
         <View style={styles.drawerAvatar}>
           <Text style={styles.drawerAvatarText}>
-            {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+            {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'P'}
           </Text>
         </View>
 
-        <Text style={styles.drawerUserName}>{currentUser?.name || 'User'}</Text>
+        <Text style={styles.drawerUserName}>{currentUser?.name || 'Saver User'}</Text>
         <Text style={styles.drawerUserEmail}>{currentUser?.email}</Text>
 
         <View style={styles.drawerRolePill}>
@@ -52,17 +52,17 @@ function CustomDrawerContent(props) {
         </View>
       </View>
 
-      {/* Drawer Menu Items */}
+      {/* Drawer Items */}
       <DrawerContentScrollView {...props} contentContainerStyle={styles.scrollContent}>
-        {/* 1. Home */}
+        {/* 1. Dashboard */}
         <TouchableOpacity
           style={styles.drawerItem}
-          onPress={() => props.navigation.navigate('MainTabs', { screen: 'HomeTab' })}
+          onPress={() => props.navigation.navigate('MainTabs', { screen: 'DashboardTab' })}
         >
           <View style={[styles.itemIconBox, { backgroundColor: '#E2FBE9' }]}>
             <Ionicons name="home-outline" size={20} color={colors.primary} />
           </View>
-          <Text style={styles.drawerItemText}>Home</Text>
+          <Text style={styles.drawerItemText}>Dashboard</Text>
         </TouchableOpacity>
 
         {/* 2. Profile (Customer only) */}
@@ -78,7 +78,7 @@ function CustomDrawerContent(props) {
           </TouchableOpacity>
         )}
 
-        {/* 3. About */}
+        {/* 3. About Saver */}
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => props.navigation.navigate('About')}
@@ -86,12 +86,12 @@ function CustomDrawerContent(props) {
           <View style={[styles.itemIconBox, { backgroundColor: '#FFF4E0' }]}>
             <Ionicons name="information-circle-outline" size={20} color={colors.warning} />
           </View>
-          <Text style={styles.drawerItemText}>About App (Exam Info)</Text>
+          <Text style={styles.drawerItemText}>About Saver</Text>
         </TouchableOpacity>
 
         <View style={styles.divider} />
 
-        {/* 4. Logout */}
+        {/* 4. Logout (resets back to Home landing screen) */}
         <TouchableOpacity
           style={[styles.drawerItem, { marginTop: 10 }]}
           onPress={() => {
@@ -108,9 +108,9 @@ function CustomDrawerContent(props) {
         </TouchableOpacity>
       </DrawerContentScrollView>
 
-      {/* Bottom Footer */}
+      {/* Footer */}
       <View style={styles.drawerFooter}>
-        <Text style={styles.footerBrand}>Finance Budget Tracker</Text>
+        <Text style={styles.footerBrand}>Saver — Smart Budgeting</Text>
         <Text style={styles.footerNote}>College Hackathon Exam v1.0</Text>
       </View>
     </SafeAreaView>
@@ -130,7 +130,7 @@ export const DrawerNavigator = () => {
           borderBottomRightRadius: 28,
         },
         drawerType: 'front',
-        swipeEdgeWidth: 100, // opens by swiping from the left edge
+        swipeEdgeWidth: 100,
       }}
     >
       <Drawer.Screen name="MainTabs" component={BottomTabNavigator} />
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   drawerHeader: {
-    backgroundColor: colors.primary, // #00D09E
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingTop: 30,
     paddingBottom: 24,

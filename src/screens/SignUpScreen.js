@@ -1,7 +1,7 @@
 /**
  * SignUpScreen.js
- * Account registration screen with role selector (Customer / Admin),
- * comprehensive inline red error validation, and automatic session login.
+ * Account registration for Saver with role selector, 10-digit phone,
+ * and prominent red inline error validation.
  */
 
 import React, { useState } from 'react';
@@ -80,8 +80,8 @@ export const SignUpScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Header
-        title="Sign Up"
-        subtitle="Create your finance tracker profile"
+        title="Create Saver Account"
+        subtitle="Start tracking smart in Rupees (₹)"
         showBack={true}
         navigation={navigation}
         showNotification={false}
@@ -148,7 +148,7 @@ export const SignUpScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            {/* Global Error Banner */}
+            {/* Error Banner */}
             {authError ? (
               <View style={styles.authErrorBox}>
                 <Ionicons name="alert-circle" size={18} color={colors.danger} />
@@ -158,7 +158,7 @@ export const SignUpScreen = ({ navigation }) => {
 
             {/* Full Name */}
             <InputField
-              label="Full Name"
+              label="Full Name *"
               value={name}
               onChangeText={(text) => {
                 setName(text);
@@ -172,13 +172,13 @@ export const SignUpScreen = ({ navigation }) => {
 
             {/* Email Address */}
             <InputField
-              label="Email Address"
+              label="Email Address *"
               value={email}
               onChangeText={(text) => {
                 setEmail(text);
                 if (errors.email) setErrors((prev) => ({ ...prev, email: null }));
               }}
-              placeholder="e.g. priya@domain.com"
+              placeholder="e.g. priya@demo.com"
               icon="mail-outline"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -187,7 +187,7 @@ export const SignUpScreen = ({ navigation }) => {
 
             {/* Phone Number (10 digits) */}
             <InputField
-              label="Phone Number (10 Digits)"
+              label="Phone Number (10 Digits) *"
               value={phone}
               onChangeText={(text) => {
                 setPhone(text);
@@ -201,7 +201,7 @@ export const SignUpScreen = ({ navigation }) => {
 
             {/* Password */}
             <InputField
-              label="Password (min 6 chars, letter + number)"
+              label="Password (min 6 chars, letter + number) *"
               value={password}
               onChangeText={(text) => {
                 setPassword(text);
@@ -215,13 +215,13 @@ export const SignUpScreen = ({ navigation }) => {
 
             {/* Confirm Password */}
             <InputField
-              label="Confirm Password"
+              label="Confirm Password *"
               value={confirmPassword}
               onChangeText={(text) => {
                 setConfirmPassword(text);
                 if (errors.confirmPassword) setErrors((prev) => ({ ...prev, confirmPassword: null }));
               }}
-              placeholder="Re-enter your password"
+              placeholder="Re-enter password"
               icon="shield-checkmark-outline"
               secureTextEntry
               error={errors.confirmPassword}
@@ -237,11 +237,11 @@ export const SignUpScreen = ({ navigation }) => {
               style={{ marginTop: 10 }}
             />
 
-            {/* Sign In link */}
+            {/* Link to Login */}
             <View style={styles.signinPromptRow}>
-              <Text style={styles.promptText}>Already have an account? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-                <Text style={styles.signinLinkText}>Sign In</Text>
+              <Text style={styles.promptText}>Already registered? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.signinLinkText}>Login</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>

@@ -1,10 +1,10 @@
 /**
  * RootNavigator.js
- * Master Stack Navigator coordinating:
- * 1. Auth Flow: Welcome -> SignIn -> SignUp
- * 2. Main App: DrawerNavigator (containing BottomTabNavigator) +
- *    EditProfile and CategoryDetails stack screens.
- * Every screen is reachable and back navigation works seamlessly.
+ * Master Stack Navigator coordinating Saver:
+ * 1. Root Stack: Home (landing) -> Login -> SignUp
+ * 2. Authenticated Stack: AppDrawer (Drawer wrapping Bottom Tabs with Dashboard) +
+ *    EditProfile and CategoryDetails.
+ * 3. Logout completely resets state back to Home landing screen.
  */
 
 import React from 'react';
@@ -14,12 +14,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { colors } from '../constants/theme';
 
-// Auth Screens
-import WelcomeScreen from '../screens/WelcomeScreen';
-import SignInScreen from '../screens/SignInScreen';
+// Public Screens
+import HomeScreen from '../screens/HomeScreen';
+import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 
-// Main App Navigation & Screens
+// Authenticated Main App Navigation & Sub-screens
 import DrawerNavigator from './DrawerNavigator';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import CategoryDetailsScreen from '../screens/CategoryDetailsScreen';
@@ -47,19 +47,16 @@ export const RootNavigator = () => {
         }}
       >
         {!isAuthenticated ? (
-          // Unauthenticated Stack
+          // Unauthenticated Stack: Starts on Home landing screen
           <Stack.Group>
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
-            <Stack.Screen name="SignIn" component={SignInScreen} />
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
           </Stack.Group>
         ) : (
-          // Authenticated Stack
+          // Authenticated Stack: Takes user directly to Dashboard (in Drawer)
           <Stack.Group>
-            {/* Drawer wraps Bottom Tabs */}
             <Stack.Screen name="AppDrawer" component={DrawerNavigator} />
-
-            {/* Sub-screens reachable via navigation */}
             <Stack.Screen
               name="EditProfile"
               component={EditProfileScreen}

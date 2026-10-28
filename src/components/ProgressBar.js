@@ -1,23 +1,23 @@
 /**
  * ProgressBar.js
  * Linear progress bar supporting both:
- * 1) Standard fintech progress bar with dynamic color thresholds
- * 2) Top header style with dark filled % part and white remaining goal amount
+ * 1) Dashboard budget goal bar with dark % and white remaining goal in ₹ (e.g. ₹2,00,000.00)
+ * 2) Dynamic status messages (<50% "Looks Good", 50-80% "Be Careful", >80% "Budget Almost Over")
+ * 3) Category bars with dynamic thresholds
  */
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors, borderRadius, typography } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { formatCurrency } from '../utils/formatters';
+import { formatINR } from '../utils/formatters';
 
 export const BudgetProgressBar = ({
   percent = 30,
-  goalAmount = 20000.0,
+  goalAmount = 200000.0,
 }) => {
   const safePercent = Math.min(100, Math.max(0, Math.round(percent)));
 
-  // Dynamic status evaluation
   let statusText = 'Looks Good.';
   let statusColor = colors.darkText;
   let iconName = 'checkmark-circle';
@@ -34,20 +34,19 @@ export const BudgetProgressBar = ({
 
   return (
     <View style={styles.headerBarWrapper}>
-      {/* Visual Bar: dark filled on left, white on right */}
       <View style={styles.track}>
         {/* Dark filled part showing % on left */}
         <View style={[styles.filledDark, { width: `${Math.max(16, safePercent)}%` }]}>
           <Text style={styles.percentText}>{safePercent}%</Text>
         </View>
 
-        {/* White remaining part with goal amount on right */}
+        {/* White remaining part with goal amount in ₹ on right */}
         <View style={styles.remainingWhite}>
-          <Text style={styles.goalText}>{formatCurrency(goalAmount)}</Text>
+          <Text style={styles.goalText}>{formatINR(goalAmount)}</Text>
         </View>
       </View>
 
-      {/* Dynamic message below progress bar */}
+      {/* Dynamic status message */}
       <View style={styles.statusRow}>
         <Ionicons name={iconName} size={16} color={statusColor} style={styles.statusIcon} />
         <Text style={[styles.statusMessage, { color: statusColor }]}>
@@ -66,11 +65,11 @@ export const CategoryProgressBar = ({
 }) => {
   const safePercent = Math.min(100, Math.max(0, Math.round(percent)));
 
-  let fillColor = colors.primary; // Under 80%
+  let fillColor = colors.primary;
   if (percent >= 100) {
-    fillColor = colors.danger; // Over 100%
+    fillColor = colors.danger;
   } else if (percent >= 80) {
-    fillColor = colors.warning; // 80-99%
+    fillColor = colors.warning;
   }
 
   return (
@@ -111,7 +110,7 @@ const styles = StyleSheet.create({
   },
   filledDark: {
     height: '100%',
-    backgroundColor: '#052224', // Dark filled part
+    backgroundColor: '#052224',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 12,

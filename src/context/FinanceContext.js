@@ -1,7 +1,7 @@
 /**
  * FinanceContext.js
  * Manages financial transactions, categories, budgets, savings goals,
- * dynamic report aggregations (Daily, Weekly, Monthly), and personalized alerts.
+ * dynamic report aggregations (Daily, Weekly, Monthly), and personalized Rupee (₹) alerts.
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -12,11 +12,12 @@ import {
   INITIAL_SAVINGS_GOAL,
 } from '../constants/dummyData';
 import { useAuth } from './AuthContext';
+import { formatINR } from '../utils/formatters';
 
-const TX_STORAGE_KEY = '@fin_tracker_transactions';
-const CAT_STORAGE_KEY = '@fin_tracker_categories';
-const GOAL_STORAGE_KEY = '@fin_tracker_savings_goal';
-const BUDGET_STORAGE_KEY = '@fin_tracker_monthly_budget';
+const TX_STORAGE_KEY = '@saver_transactions_v2';
+const CAT_STORAGE_KEY = '@saver_categories_v2';
+const GOAL_STORAGE_KEY = '@saver_savings_goal_v2';
+const BUDGET_STORAGE_KEY = '@saver_monthly_budget_v2';
 
 export const FinanceContext = createContext();
 
@@ -25,13 +26,12 @@ export const FinanceProvider = ({ children }) => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
   const [savingsGoal, setSavingsGoal] = useState(INITIAL_SAVINGS_GOAL);
-  const [monthlyBudget, setMonthlyBudget] = useState(5000.00);
+  const [monthlyBudget, setMonthlyBudget] = useState(35000.00);
   const [isLoading, setIsLoading] = useState(true);
 
   // Personalized Alert modal state
-  const [activeAlert, setActiveAlert] = useState(null); // { title, message, type: 'success' | 'warning' | 'danger' }
+  const [activeAlert, setActiveAlert] = useState(null);
 
-  // Load persisted state or initial seed
   useEffect(() => {
     const loadFinanceData = async () => {
       try {
@@ -76,7 +76,6 @@ export const FinanceProvider = ({ children }) => {
     loadFinanceData();
   }, [currentUser]);
 
-  // Persist helper
   const saveTransactions = async (newTxList) => {
     setTransactions(newTxList);
     try {
@@ -90,21 +89,14 @@ export const FinanceProvider = ({ children }) => {
    * Calculate monthly financial totals
    */
   const getMonthlyTotals = () => {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
-
     let totalIncome = 0;
     let totalExpense = 0;
 
     transactions.forEach((tx) => {
-      const txDate = new Date(tx.date);
-      if (txDate.getFullYear() === currentYear && txDate.getMonth() === currentMonth) {
-        if (tx.type === 'income') {
-          totalIncome += Math.abs(Number(tx.amount) || 0);
-        } else {
-          totalExpense += Math.abs(Number(tx.amount) || 0);
-        }
+      if (tx.type === 'income') {
+        totalIncome += Math.abs(Number(tx.amount) || 0);
+      } else {
+        totalExpense += Math.abs(Number(tx.amount) || 0);
       }
     });
 
@@ -123,7 +115,7 @@ export const FinanceProvider = ({ children }) => {
   };
 
   /**
-   * Add a new transaction with personalized feedback & budget threshold warnings
+   * Add a new transaction with personalized Rupee (₹) feedback & budget threshold warnings
    */
   const addTransaction = async (txData) => {
     const amountVal = Math.abs(Number(txData.amount) || 0);
@@ -146,7 +138,6 @@ export const FinanceProvider = ({ children }) => {
     const updated = [newTx, ...transactions];
     await saveTransactions(updated);
 
-    // Calculate updated budget left
     const userName = currentUser?.name ? currentUser.name.split(' ')[0] : 'there';
     
     // Calculate new total expenses for this category
@@ -162,28 +153,25 @@ export const FinanceProvider = ({ children }) => {
       }
     });
 
-    // Check overall monthly budget
     let totalExpenseMonthly = 0;
     updated.forEach((t) => {
       if (t.type === 'expense') totalExpenseMonthly += Math.abs(t.amount);
     });
     const budgetLeft = Math.max(0, monthlyBudget - totalExpenseMonthly);
 
-    // Formulate personalized alert
     let alertTitle = 'Transaction Added! 💰';
-    let alertMessage = `Hey ${userName}, your ${txData.category} ${txData.type} of $${amountVal.toFixed(2)} was recorded. You have $${budgetLeft.toFixed(2)} left in your budget this month.`;
+    let alertMessage = `Hey ${userName}, your ${txData.category} ${txData.type} of ${formatINR(amountVal)} was added. You have ${formatINR(budgetLeft)} left this month.`;
     let alertType = 'success';
 
-    // Check category warnings (80% and 100%)
     if (matchedCategory && matchedCategory.budget > 0 && txData.type === 'expense') {
       const catUsagePercent = (catTotalExpense / matchedCategory.budget) * 100;
       if (catUsagePercent >= 100) {
         alertTitle = '⚠️ Category Budget Exceeded!';
-        alertMessage = `Hey ${userName}, your ${matchedCategory.displayName} expense pushed spending to $${catTotalExpense.toFixed(2)}, which exceeds your $${matchedCategory.budget} limit!`;
+        alertMessage = `Hey ${userName}, your ${matchedCategory.displayName} expense pushed spending to ${formatINR(catTotalExpense)}, which exceeds your ${formatINR(matchedCategory.budget)} limit!`;
         alertType = 'danger';
       } else if (catUsagePercent >= 80) {
         alertTitle = '⚠️ Category Budget Warning';
-        alertMessage = `Hey ${userName}, you've used ${catUsagePercent.toFixed(0)}% of your ${matchedCategory.displayName} budget ($${catTotalExpense.toFixed(2)} / $${matchedCategory.budget}). Be careful!`;
+        alertMessage = `Hey ${userName}, you've used ${catUsagePercent.toFixed(0)}% of your ${matchedCategory.displayName} budget (${formatINR(catTotalExpense)} / ${formatINR(matchedCategory.budget)}). Be careful!`;
         alertType = 'warning';
       }
     }
@@ -212,7 +200,7 @@ export const FinanceProvider = ({ children }) => {
     const userName = currentUser?.name ? currentUser.name.split(' ')[0] : 'there';
     setActiveAlert({
       title: 'Transaction Updated ✏️',
-      message: `Hey ${userName}, your transaction "${updatedTx.title}" has been successfully updated.`,
+      message: `Hey ${userName}, your transaction "${updatedTx.title}" of ${formatINR(amountVal)} has been updated.`,
       type: 'success',
     });
   };
@@ -226,17 +214,14 @@ export const FinanceProvider = ({ children }) => {
     await saveTransactions(newTxList);
 
     const userName = currentUser?.name ? currentUser.name.split(' ')[0] : 'there';
-    const amountStr = target ? `$${Math.abs(target.amount).toFixed(2)}` : '';
+    const amountStr = target ? ` (${formatINR(Math.abs(target.amount))})` : '';
     setActiveAlert({
       title: 'Transaction Deleted 🗑️',
-      message: `Hey ${userName}, the transaction ${amountStr ? `(${amountStr})` : ''} was removed from your records.`,
+      message: `Hey ${userName}, the transaction${amountStr} was removed from your records.`,
       type: 'warning',
     });
   };
 
-  /**
-   * Update monthly budget
-   */
   const updateMonthlyBudget = async (newBudget) => {
     const val = Number(newBudget);
     if (!isNaN(val) && val > 0) {
@@ -245,9 +230,6 @@ export const FinanceProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Update individual category budget
-   */
   const updateCategoryBudget = async (categoryId, newBudget) => {
     const val = Number(newBudget);
     const updatedCats = categories.map((c) =>
@@ -271,7 +253,6 @@ export const FinanceProvider = ({ children }) => {
       const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       filtered = transactions.filter((t) => new Date(t.date) >= sevenDaysAgo);
     } else {
-      // Monthly
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
       filtered = transactions.filter((t) => {
@@ -300,9 +281,6 @@ export const FinanceProvider = ({ children }) => {
     };
   };
 
-  /**
-   * Close active alert modal
-   */
   const dismissAlert = () => setActiveAlert(null);
 
   return (

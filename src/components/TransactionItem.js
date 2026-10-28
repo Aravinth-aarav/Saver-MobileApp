@@ -1,19 +1,19 @@
 /**
  * TransactionItem.js
- * Single transaction list row matching the exact reference layout:
+ * Single transaction list row matching reference layout:
  * - Rounded-square blue icon tile
  * - Bold title
  * - Small blue bold time and date (e.g. 18:27 - April 30)
  * - Vertical divider
  * - Category text (Monthly / Pantry / Rent)
- * - Amount on the right (income dark, expenses blue with minus)
+ * - Amount in Indian Rupees (₹) on the right (income dark, expenses blue with minus: -₹1,000.00)
  */
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, borderRadius, typography } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { formatCurrency, formatDateTime } from '../utils/formatters';
+import { formatINR, formatDateTime } from '../utils/formatters';
 
 export const TransactionItem = ({
   transaction,
@@ -33,11 +33,8 @@ export const TransactionItem = ({
 
   const isIncome = type === 'income' || amount > 0;
   const numAmount = Number(amount);
-
-  // Pick appropriate icon tile color if not set
   const tileBg = tileColor || (isIncome ? colors.iconTileBlueDark : colors.iconTileBlueMedium);
 
-  // Time & Date format: "18:27 - April 30"
   let formattedTimeDate = '';
   if (time && date) {
     const d = new Date(date);
@@ -50,16 +47,15 @@ export const TransactionItem = ({
     formattedTimeDate = formatDateTime(date) || '18:27 - April 30';
   }
 
-  // Pick icon dynamically if icon is string
   const resolveIconName = (name) => {
     if (!name) return 'receipt-outline';
     if (name.includes('car')) return 'car-outline';
-    if (name.includes('cart') || name.includes('pantry')) return 'cart-outline';
-    if (name.includes('wallet') || name.includes('salary')) return 'cash-outline';
+    if (name.includes('cart') || name.includes('pantry') || name.includes('grocer')) return 'cart-outline';
+    if (name.includes('wallet') || name.includes('salary') || name.includes('cash')) return 'cash-outline';
     if (name.includes('home') || name.includes('rent')) return 'home-outline';
     if (name.includes('cafe') || name.includes('food')) return 'restaurant-outline';
     if (name.includes('bill') || name.includes('flash')) return 'flash-outline';
-    if (name.includes('medkit') || name.includes('health')) return 'medkit-outline';
+    if (name.includes('medkit') || name.includes('health') || name.includes('pharmacy')) return 'medkit-outline';
     if (name.includes('film') || name.includes('movie')) return 'film-outline';
     return name;
   };
@@ -78,12 +74,10 @@ export const TransactionItem = ({
 
       {/* 2. Middle Details */}
       <View style={styles.detailsContainer}>
-        {/* Title (Bold) */}
         <Text style={styles.title} numberOfLines={1}>
           {title}
         </Text>
 
-        {/* Sub-row: Time & Date | Divider | Category */}
         <View style={styles.metaRow}>
           <Text style={styles.timeDateText}>
             {formattedTimeDate}
@@ -105,7 +99,7 @@ export const TransactionItem = ({
             isIncome ? styles.incomeText : styles.expenseText,
           ]}
         >
-          {formatCurrency(numAmount, { showExplicitPlus: true })}
+          {formatINR(numAmount, { showExplicitPlus: true })}
         </Text>
       </View>
     </TouchableOpacity>
@@ -132,7 +126,7 @@ const styles = StyleSheet.create({
   iconTile: {
     width: 46,
     height: 46,
-    borderRadius: borderRadius.iconTile, // Rounded-square tile
+    borderRadius: borderRadius.iconTile,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
@@ -156,7 +150,7 @@ const styles = StyleSheet.create({
     fontFamily: typography.semiBold,
     fontWeight: '700',
     fontSize: 11.5,
-    color: colors.blueAmount, // Small blue bold text
+    color: colors.blueAmount,
   },
   metaDivider: {
     width: 1,
@@ -181,10 +175,10 @@ const styles = StyleSheet.create({
     fontSize: 15.5,
   },
   incomeText: {
-    color: colors.darkText, // Income dark
+    color: colors.darkText,
   },
   expenseText: {
-    color: colors.blueAmount, // Expenses blue with minus
+    color: colors.blueAmount,
   },
 });
 

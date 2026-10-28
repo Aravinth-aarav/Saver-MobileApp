@@ -1,7 +1,7 @@
 /**
  * ProfileScreen.js
  * Customer profile screen showing user avatar, name, email, phone,
- * monthly budget goal, summary tracking stats, and link to Edit Profile.
+ * monthly budget goal in Indian Rupees (₹), and quick navigation links.
  */
 
 import React from 'react';
@@ -20,19 +20,19 @@ import { Card } from '../components/Card';
 import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import { useFinance } from '../context/FinanceContext';
-import { formatCurrency } from '../utils/formatters';
+import { formatINR } from '../utils/formatters';
 
 export const ProfileScreen = ({ navigation }) => {
   const { currentUser, logout, role } = useAuth();
   const { monthlyBudget, transactions, categories } = useFinance();
 
-  const userInitial = currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
+  const userInitial = currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'P';
 
   return (
     <View style={styles.container}>
       <Header
         title="Profile & Settings"
-        subtitle="Manage your personal account"
+        subtitle="Manage your personal Saver account"
         showBack={false}
         navigation={navigation}
         showNotification={false}
@@ -64,7 +64,7 @@ export const ProfileScreen = ({ navigation }) => {
             <Text style={styles.userName}>{currentUser?.name || 'Priya Sharma'}</Text>
             <Text style={styles.userEmail}>{currentUser?.email || 'customer@demo.com'}</Text>
             <Text style={styles.userPhone}>
-              📞 {currentUser?.phone || '9876543210'}
+              📞 +91 {currentUser?.phone || '9876543210'}
             </Text>
 
             <Button
@@ -77,15 +77,15 @@ export const ProfileScreen = ({ navigation }) => {
             />
           </Card>
 
-          {/* Monthly Budget Card */}
+          {/* Monthly Budget Card in ₹ */}
           <Card style={styles.budgetCard}>
             <View style={styles.budgetLeft}>
               <View style={styles.budgetIconCircle}>
-                <Ionicons name="wallet-outline" size={22} color={colors.primary} />
+                <Text style={{ fontSize: 22, color: colors.primary, fontWeight: '800' }}>₹</Text>
               </View>
               <View>
                 <Text style={styles.budgetLabel}>Monthly Budget Limit</Text>
-                <Text style={styles.budgetValue}>{formatCurrency(monthlyBudget)}</Text>
+                <Text style={styles.budgetValue}>{formatINR(monthlyBudget)}</Text>
               </View>
             </View>
 
@@ -113,7 +113,7 @@ export const ProfileScreen = ({ navigation }) => {
             </View>
           </View>
 
-          {/* App Preferences */}
+          {/* Preferences */}
           <Text style={styles.sectionHeading}>Preferences</Text>
           <Card style={styles.menuCard}>
             <TouchableOpacity
@@ -122,7 +122,7 @@ export const ProfileScreen = ({ navigation }) => {
             >
               <View style={styles.menuItemLeft}>
                 <Ionicons name="information-circle-outline" size={20} color={colors.darkText} />
-                <Text style={styles.menuItemText}>About Hackathon Project</Text>
+                <Text style={styles.menuItemText}>About Saver App</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={colors.textLight} />
             </TouchableOpacity>
@@ -145,7 +145,7 @@ export const ProfileScreen = ({ navigation }) => {
             </TouchableOpacity>
           </Card>
 
-          {/* Logout Button */}
+          {/* Logout Button (resets to Home landing screen) */}
           <Button
             title="Log Out"
             onPress={logout}

@@ -1,11 +1,11 @@
 /**
  * AnalysisScreen.js
- * Visual financial analytics for both Admin & Customer roles:
- * - Summary KPI cards (Total Income, Total Expense, Net Savings, Savings Rate %)
- * - Category Donut / Pie Chart with breakdown percentages
- * - Monthly Income vs Expense Bar Chart
- * - Category spending distribution list with progress indicators
- * - Admin system status badge when logged in as Admin
+ * Visual financial analytics for Saver:
+ * - Summary KPI cards in Indian Rupees (₹)
+ * - Category Donut / Pie Chart
+ * - Monthly Income vs Expense Bar Chart in ₹
+ * - Category spending breakdown in ₹
+ * - Admin mode indicator showing overall totals across all customers
  */
 
 import React, { useState } from 'react';
@@ -24,7 +24,7 @@ import { Card } from '../components/Card';
 import { CategoryProgressBar } from '../components/ProgressBar';
 import { useFinance } from '../context/FinanceContext';
 import { useAuth } from '../context/AuthContext';
-import { formatCurrency } from '../utils/formatters';
+import { formatINR } from '../utils/formatters';
 import { PieChart, BarChart } from 'react-native-chart-kit';
 
 const screenWidth = Dimensions.get('window').width;
@@ -32,7 +32,7 @@ const screenWidth = Dimensions.get('window').width;
 export const AnalysisScreen = ({ navigation }) => {
   const { transactions, categories, getMonthlyTotals } = useFinance();
   const { role, currentUser } = useAuth();
-  const [selectedChartType, setSelectedChartType] = useState('categories'); // 'categories' | 'comparison'
+  const [selectedChartType, setSelectedChartType] = useState('categories');
 
   const totals = getMonthlyTotals();
   const savingsRate = totals.totalIncome > 0
@@ -76,20 +76,15 @@ export const AnalysisScreen = ({ navigation }) => {
       legendFontSize: 12,
     }));
 
-  // Bar chart dataset: Income vs Expense
+  // Bar chart dataset in ₹
   const barData = {
-    labels: ['Income', 'Expenses', 'Net Saved'],
+    labels: ['Income', 'Expense', 'Saved'],
     datasets: [
       {
         data: [
           totals.totalIncome,
           totals.totalExpense,
           Math.max(0, totals.balance),
-        ],
-        colors: [
-          (opacity = 1) => `rgba(0, 208, 158, ${opacity})`,
-          (opacity = 1) => `rgba(0, 104, 255, ${opacity})`,
-          (opacity = 1) => `rgba(50, 153, 255, ${opacity})`,
         ],
       },
     ],
@@ -99,7 +94,7 @@ export const AnalysisScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Header
         title="Financial Analysis"
-        subtitle={role === 'admin' ? 'System Supervisor Analytics' : 'Your spending insights & charts'}
+        subtitle={role === 'admin' ? 'Admin Overview Across All Customers' : 'Your spending insights in ₹'}
         showBack={false}
         navigation={navigation}
         showNotification={true}
@@ -110,17 +105,17 @@ export const AnalysisScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.sheetContent}
         >
-          {/* Admin Mode Ribbon */}
+          {/* Admin Banner */}
           {role === 'admin' && (
             <View style={styles.adminBanner}>
               <Ionicons name="shield-checkmark" size={18} color={colors.white} />
               <Text style={styles.adminBannerText}>
-                Admin View Active: Showing aggregate system telemetry for {currentUser?.name}
+                Admin View Active: Showing overall financial metrics across all customers
               </Text>
             </View>
           )}
 
-          {/* 1. Summary KPI Grid */}
+          {/* 1. Summary KPI Grid in ₹ */}
           <View style={styles.kpiRow}>
             <View style={[styles.kpiCard, shadows.card]}>
               <View style={[styles.kpiIcon, { backgroundColor: '#E2FBE9' }]}>
@@ -128,7 +123,7 @@ export const AnalysisScreen = ({ navigation }) => {
               </View>
               <Text style={styles.kpiLabel}>Total Income</Text>
               <Text style={styles.kpiValueIncome}>
-                {formatCurrency(totals.totalIncome)}
+                {formatINR(totals.totalIncome)}
               </Text>
             </View>
 
@@ -138,7 +133,7 @@ export const AnalysisScreen = ({ navigation }) => {
               </View>
               <Text style={styles.kpiLabel}>Total Expense</Text>
               <Text style={styles.kpiValueExpense}>
-                {formatCurrency(-totals.totalExpense)}
+                {formatINR(-totals.totalExpense)}
               </Text>
             </View>
           </View>
@@ -148,9 +143,9 @@ export const AnalysisScreen = ({ navigation }) => {
               <View style={[styles.kpiIcon, { backgroundColor: '#E6F8F3' }]}>
                 <Ionicons name="wallet-outline" size={18} color={colors.darkText} />
               </View>
-              <Text style={styles.kpiLabel}>Net Balance</Text>
+              <Text style={styles.kpiLabel}>Total Balance</Text>
               <Text style={styles.kpiValueBalance}>
-                {formatCurrency(totals.balance)}
+                {formatINR(totals.balance)}
               </Text>
             </View>
 
@@ -214,7 +209,7 @@ export const AnalysisScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* 2. Interactive Charts Container */}
+          {/* Charts Container */}
           <Card style={styles.chartCard}>
             {selectedChartType === 'categories' ? (
               <View style={styles.chartWrapper}>
@@ -240,12 +235,12 @@ export const AnalysisScreen = ({ navigation }) => {
               </View>
             ) : (
               <View style={styles.chartWrapper}>
-                <Text style={styles.chartTitle}>Monthly Income vs Expenses</Text>
+                <Text style={styles.chartTitle}>Monthly Income vs Expenses (₹)</Text>
                 <BarChart
                   data={barData}
                   width={screenWidth - 72}
                   height={220}
-                  yAxisLabel="$"
+                  yAxisLabel="₹"
                   yAxisSuffix=""
                   fromZero
                   chartConfig={{
@@ -263,7 +258,7 @@ export const AnalysisScreen = ({ navigation }) => {
             )}
           </Card>
 
-          {/* 3. Category Spending Breakdown */}
+          {/* Category Spending Breakdown in ₹ */}
           <Text style={styles.sectionHeading}>Category Spending Breakdown</Text>
           {categorySpending.map((cat) => (
             <View key={cat.id} style={styles.breakdownRow}>
@@ -273,7 +268,7 @@ export const AnalysisScreen = ({ navigation }) => {
               </View>
 
               <View style={styles.catRightInfo}>
-                <Text style={styles.catSpent}>{formatCurrency(cat.spent)}</Text>
+                <Text style={styles.catSpent}>{formatINR(cat.spent)}</Text>
                 <Text style={styles.catPercent}>({cat.percent}%)</Text>
               </View>
 
@@ -283,7 +278,6 @@ export const AnalysisScreen = ({ navigation }) => {
             </View>
           ))}
 
-          {/* Extra bottom spacing */}
           <View style={{ height: 80 }} />
         </ScrollView>
       </View>

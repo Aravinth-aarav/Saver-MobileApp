@@ -1,39 +1,36 @@
 /**
  * AuthContext.js
- * Manages user authentication state, roles (Customer vs Admin),
- * demo logins, registration, and AsyncStorage persistence.
+ * Authentication and Role state for Saver app:
+ * - Boot policy: opens directly on Home landing screen (no auto-login)
+ * - Sign In & Sign Up for Customer & Admin
+ * - Saved registered users in AsyncStorage
+ * - Logout resets back to Home landing screen
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DEMO_USERS } from '../constants/dummyData';
 
-const AUTH_STORAGE_KEY = '@fin_tracker_user_session';
-const USERS_STORAGE_KEY = '@fin_tracker_registered_users';
+const AUTH_STORAGE_KEY = '@saver_user_session';
+const USERS_STORAGE_KEY = '@saver_registered_users';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null); // Starts as null so app opens on Home landing screen
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize and check persisted session
+  // Initialize storage seeds
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Ensure demo users exist in storage
         const savedUsersJson = await AsyncStorage.getItem(USERS_STORAGE_KEY);
         if (!savedUsersJson) {
           await AsyncStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(DEMO_USERS));
         }
-
-        // Check if there's an active session
-        const sessionJson = await AsyncStorage.getItem(AUTH_STORAGE_KEY);
-        if (sessionJson) {
-          setCurrentUser(JSON.parse(sessionJson));
-        }
+        // Notice: No auto-login on initial scan per exam specification!
       } catch (error) {
-        console.error('Failed to load auth session:', error);
+        console.error('Failed to initialize auth storage:', error);
       } finally {
         setIsLoading(false);
       }
@@ -43,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * Log in user by email, password, and expected role
+   * Login user with email, password, and expected role
    */
   const login = async (email, password, role) => {
     try {
@@ -62,11 +59,10 @@ export const AuthProvider = ({ children }) => {
       if (matchedUser.role !== role) {
         return {
           success: false,
-          message: `This account is registered as a ${matchedUser.role.toUpperCase()}. Please switch role selector above to ${matchedUser.role}.`,
+          message: `This account is registered as ${matchedUser.role.toUpperCase()}. Please switch role to ${matchedUser.role}.`,
         };
       }
 
-      // Persist session
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(matchedUser));
       setCurrentUser(matchedUser);
       return { success: true, user: matchedUser };
@@ -77,7 +73,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Register a new user
+   * Register new account
    */
   const signup = async ({ name, email, phone, password, role }) => {
     try {
@@ -98,8 +94,7 @@ export const AuthProvider = ({ children }) => {
         phone: phone.trim(),
         password,
         role,
-        monthlyBudget: 5000.00,
-        avatar: null,
+        monthlyBudget: 35000.00,
       };
 
       allUsers.push(newUser);
@@ -115,7 +110,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Log out and clear session
+   * Logout user and return to Home landing screen
    */
   const logout = async () => {
     try {
@@ -127,7 +122,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Update profile information
+   * Update profile info
    */
   const updateProfile = async (updatedFields) => {
     try {
@@ -135,7 +130,6 @@ export const AuthProvider = ({ children }) => {
 
       const updatedUser = { ...currentUser, ...updatedFields };
 
-      // Update in registered users list
       const savedUsersJson = await AsyncStorage.getItem(USERS_STORAGE_KEY);
       const allUsers = savedUsersJson ? JSON.parse(savedUsersJson) : [...DEMO_USERS];
       const userIndex = allUsers.findIndex((u) => u.id === currentUser.id);
@@ -144,7 +138,6 @@ export const AuthProvider = ({ children }) => {
         await AsyncStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(allUsers));
       }
 
-      // Update session
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
       setCurrentUser(updatedUser);
       return { success: true, user: updatedUser };

@@ -1,25 +1,44 @@
 /**
  * formatters.js
- * Helpers for currency, dates, times, and dynamic time-of-day greetings
+ * Helpers for Indian Rupee (₹) formatting with Indian digit grouping,
+ * dates, times, and dynamic time-of-day greetings.
+ * Pure JavaScript - Does NOT rely on Intl for Hermes/React Native compatibility.
  */
 
-export const formatCurrency = (amount, options = {}) => {
+/**
+ * Formats numbers into Indian Rupee (₹) currency with Indian grouping:
+ * e.g. ₹1,25,000.00 | ₹77,830.00 | -₹1,000.00 | +₹40,000.00
+ */
+export const formatINR = (amount, options = {}) => {
   const num = Number(amount) || 0;
   const isNegative = num < 0;
   const absNum = Math.abs(num);
 
-  const formatted = absNum.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  // Convert to fixed 2 decimals
+  const fixed = absNum.toFixed(2);
+  const [intPart, decPart] = fixed.split('.');
+
+  // Format integer part using Indian digit grouping (last 3 digits, then pairs of 2)
+  let formattedInt = '';
+  if (intPart.length <= 3) {
+    formattedInt = intPart;
+  } else {
+    const lastThree = intPart.substring(intPart.length - 3);
+    const remaining = intPart.substring(0, intPart.length - 3);
+    // Group remaining digits in pairs of 2 from right to left
+    const pairs = remaining.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+    formattedInt = `${pairs},${lastThree}`;
+  }
+
+  const formattedNum = `${formattedInt}.${decPart}`;
 
   if (options.showExplicitPlus && num > 0) {
-    return `+$${formatted}`;
+    return `+₹${formattedNum}`;
   }
   if (isNegative) {
-    return `-$${formatted}`;
+    return `-₹${formattedNum}`;
   }
-  return `$${formatted}`;
+  return `₹${formattedNum}`;
 };
 
 export const formatDateTime = (dateInput) => {

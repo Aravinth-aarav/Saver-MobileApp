@@ -1,9 +1,7 @@
 /**
  * CategoriesScreen.js
- * Customer screen displaying grid of categories:
- * - Food, Transport, Shopping, Bills, Health, Entertainment
- * - Blue icon tile, amount spent, budget, progress bar (<80% green, 80-99% orange, >=100% red)
- * - Tapping navigates to Category Details screen
+ * Customer screen displaying grid of categories in Indian Rupees (₹):
+ * Food, Transport, Shopping, Bills, Health, Entertainment.
  */
 
 import React from 'react';
@@ -17,12 +15,11 @@ import { colors, borderRadius, typography, shadows } from '../constants/theme';
 import { Header } from '../components/Header';
 import { CategoryCard } from '../components/CategoryCard';
 import { useFinance } from '../context/FinanceContext';
-import { formatCurrency } from '../utils/formatters';
+import { formatINR } from '../utils/formatters';
 
 export const CategoriesScreen = ({ navigation }) => {
-  const { categories, transactions, monthlyBudget } = useFinance();
+  const { categories, transactions } = useFinance();
 
-  // Aggregate total spent across categories
   let totalSpentAcrossCategories = 0;
   let totalAllocatedBudget = 0;
 
@@ -56,7 +53,7 @@ export const CategoriesScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Header
         title="Budget Categories"
-        subtitle="Spending limits and category thresholds"
+        subtitle="Spending limits in Indian Rupees (₹)"
         showBack={false}
         navigation={navigation}
         showNotification={true}
@@ -67,12 +64,12 @@ export const CategoriesScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.sheetContent}
         >
-          {/* Top Overview Banner */}
+          {/* Top Overview Banner in ₹ */}
           <View style={[styles.overviewCard, shadows.card]}>
             <View style={styles.overviewCol}>
               <Text style={styles.overviewLabel}>Total Category Budget</Text>
               <Text style={styles.overviewValBudget}>
-                {formatCurrency(totalAllocatedBudget)}
+                {formatINR(totalAllocatedBudget)}
               </Text>
             </View>
 
@@ -81,15 +78,14 @@ export const CategoriesScreen = ({ navigation }) => {
             <View style={styles.overviewCol}>
               <Text style={styles.overviewLabel}>Total Category Spent</Text>
               <Text style={styles.overviewValSpent}>
-                {formatCurrency(totalSpentAcrossCategories)}
+                {formatINR(totalSpentAcrossCategories)}
               </Text>
             </View>
           </View>
 
-          {/* Section Subtitle */}
           <Text style={styles.sectionTitle}>All Spending Categories</Text>
 
-          {/* Grid / List of Categories */}
+          {/* Grid of Category Cards */}
           {enrichedCategories.map((cat) => (
             <CategoryCard
               key={cat.id}
@@ -106,7 +102,6 @@ export const CategoriesScreen = ({ navigation }) => {
             />
           ))}
 
-          {/* Extra bottom padding for floating bottom tab bar */}
           <View style={{ height: 80 }} />
         </ScrollView>
       </View>
