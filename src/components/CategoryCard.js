@@ -3,6 +3,7 @@
  * Enhanced Category Card with:
  * - Modern solid filled icons (fast-food, car-sport, cart, receipt, medical, videocam)
  * - Tactile spring press animation
+ * - Quick Edit Budget trigger button
  * - Glowing icon tile and clean typography
  */
 
@@ -18,6 +19,7 @@ export const CategoryCard = ({
   spent = 0,
   transactionCount = 0,
   onPress,
+  onEditPress,
   style,
 }) => {
   const { displayName, name, icon, budget = 5000, color = colors.iconTileBlueMedium } = category;
@@ -89,15 +91,31 @@ export const CategoryCard = ({
         onPressOut={handlePressOut}
         style={[styles.card, shadows.card, style]}
       >
-        {/* Top row: Styled Icon tile & Status badge */}
+        {/* Top row: Styled Icon tile, Status badge, and Edit button */}
         <View style={styles.topRow}>
-          <View style={[styles.iconTile, { backgroundColor: color, shadowColor: color }]}>
-            <Ionicons name={resolveCategoryIcon(icon)} size={22} color={colors.white} />
+          <View style={styles.leftGroup}>
+            <View style={[styles.iconTile, { backgroundColor: color, shadowColor: color }]}>
+              <Ionicons name={resolveCategoryIcon(icon)} size={22} color={colors.white} />
+            </View>
+
+            <View style={[styles.badge, { backgroundColor: badgeBg }]}>
+              <Text style={[styles.badgeText, { color: badgeColor }]}>{badgeText}</Text>
+            </View>
           </View>
 
-          <View style={[styles.badge, { backgroundColor: badgeBg }]}>
-            <Text style={[styles.badgeText, { color: badgeColor }]}>{badgeText}</Text>
-          </View>
+          {onEditPress && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={(e) => {
+                if (e && e.stopPropagation) e.stopPropagation();
+                onEditPress(category);
+              }}
+              style={styles.editPill}
+            >
+              <Ionicons name="pencil" size={13} color={colors.primary} />
+              <Text style={styles.editPillText}>Edit Budget</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Title & Count */}
@@ -145,6 +163,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 12,
   },
+  leftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   iconTile: {
     width: 46,
     height: 46,
@@ -160,11 +182,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: borderRadius.pill,
+    marginLeft: 10,
   },
   badgeText: {
     fontFamily: typography.semiBold,
     fontSize: 11,
     fontWeight: '700',
+  },
+  editPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E2FBE9',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: borderRadius.pill,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 208, 158, 0.25)',
+  },
+  editPillText: {
+    fontFamily: typography.semiBold,
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: colors.primary,
+    marginLeft: 4,
   },
   categoryName: {
     fontFamily: typography.bold,
